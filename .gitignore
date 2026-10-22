@@ -1,0 +1,29 @@
+# Secrets and local data
+.env
+data/
+*.db
+*.sqlite3
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.pyright/
+*.egg-info/
+
+# Node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# OS / editor
+.DS_Store
+.idea/
+
+# Local tooling
+.vscode/
+CLAUDE.md
