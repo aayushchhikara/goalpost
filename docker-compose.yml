@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file: .env
+    environment:
+      GOALPOST_DATABASE_URL: sqlite:////data/goalpost.db
+      GOALPOST_FRONTEND_ORIGIN: http://localhost:3000
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - goalpost-data:/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    environment:
+      API_URL: http://backend:8000
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  goalpost-data:

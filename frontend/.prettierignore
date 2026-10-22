@@ -1,0 +1,5 @@
+.next
+node_modules
+lib/api/schema.ts
+lib/api/openapi.json
+pnpm-lock.yaml
