@@ -12,9 +12,3 @@ docker compose up --build
 Open <http://localhost:3000>. Both services bind to `127.0.0.1` only; never expose them to the internet.
 
 For development without Docker, see [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Docs
-
-- [Idea summary](docs/idea.md)
-- [Data model](docs/data-model.md)
-- [Connector SDK](docs/sdk.md)

@@ -18,4 +18,4 @@ Install hooks with `uv run pre-commit install`.
 
 Copy `connectors/_template/` to `connectors/<name>/`, implement the connector base class from
 `backend/goalpost/sdk/`, and declare a manifest. Connectors only suggest evidence; the user
-confirms. See [docs/sdk.md](docs/sdk.md).
+confirms.

@@ -27,3 +27,6 @@ next-env.d.ts
 # Local tooling
 .vscode/
 CLAUDE.md
+
+# Private design docs (not published)
+docs/
