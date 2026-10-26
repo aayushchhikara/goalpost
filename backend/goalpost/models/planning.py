@@ -1,7 +1,7 @@
 import datetime as dt
 
 from sqlalchemy import Boolean, Date, ForeignKey, Integer, String, Text, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from goalpost.db import Base
 from goalpost.models.base import DEFAULT_USER_ID, IdMixin, UserMixin, UTCDateTime, str_enum, utcnow
@@ -41,6 +41,12 @@ class Task(IdMixin, UserMixin, Base):
     status: Mapped[TaskStatus] = mapped_column(str_enum(TaskStatus), default=TaskStatus.OPEN)
     created_at: Mapped[dt.datetime] = mapped_column(UTCDateTime(), default=utcnow)
 
+    first_planned_week: Mapped[Week | None] = relationship(lazy="joined")
+
+    @property
+    def first_planned_week_start(self) -> dt.date | None:
+        return self.first_planned_week.start_date if self.first_planned_week else None
+
 
 class Occurrence(IdMixin, UserMixin, Base):
     __tablename__ = "occurrences"
@@ -55,3 +61,18 @@ class Occurrence(IdMixin, UserMixin, Base):
     )
     late: Mapped[bool] = mapped_column(Boolean, default=False)
     completed_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime())
+
+    task: Mapped[Task] = relationship(lazy="joined")
+    week: Mapped[Week] = relationship(lazy="joined")
+
+    @property
+    def week_start(self) -> dt.date:
+        return self.week.start_date
+
+    @property
+    def carried_over(self) -> bool:
+        """True when a one-off task was first planned in an earlier week than this one."""
+        return self.task.kind == TaskKind.ONE_OFF and self.task.first_planned_week_id not in (
+            None,
+            self.week_id,
+        )
