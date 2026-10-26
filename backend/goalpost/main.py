@@ -9,6 +9,7 @@ from goalpost.api import health, v1
 from goalpost.db import get_engine
 from goalpost.errors import install_error_handlers
 from goalpost.migrate import run_migrations
+from goalpost.scheduler import run_close_job, start_scheduler
 from goalpost.services.settings import ensure_settings
 from goalpost.settings import get_settings
 
@@ -17,8 +18,11 @@ from goalpost.settings import get_settings
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     run_migrations()
     with Session(get_engine()) as session:
-        ensure_settings(session)
+        timezone = ensure_settings(session).timezone
+    run_close_job()  # catch up on days that ended while the app was off
+    scheduler = start_scheduler(timezone)
     yield
+    scheduler.shutdown(wait=False)
 
 
 def create_app() -> FastAPI:
