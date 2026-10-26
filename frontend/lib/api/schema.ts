@@ -4,6 +4,244 @@
  */
 
 export interface paths {
+    "/api/v1/backlog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Backlog
+         * @description Open one-off tasks not planned into any open week.
+         */
+        get: operations["getBacklog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/jobs/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Run Close Job
+         * @description Run the close job now. It also runs at midnight and on startup.
+         */
+        post: operations["runCloseJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/occurrences/{occurrence_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Move
+         * @description Move to another remaining day of the same week, or to "any day".
+         */
+        patch: operations["moveOccurrence"];
+        trace?: never;
+    };
+    "/api/v1/occurrences/{occurrence_id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete
+         * @description Mark done by hand. A missed occurrence is marked late.
+         */
+        post: operations["completeOccurrence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/occurrences/{occurrence_id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reopen
+         * @description Undo a complete or skip.
+         */
+        post: operations["reopenOccurrence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/occurrences/{occurrence_id}/skip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Skip
+         * @description Skip deliberately; skipped occurrences don't count against adherence.
+         */
+        post: operations["skipOccurrence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Task
+         * @description Create a task. Pass `plan` to put it straight into a week or day.
+         */
+        post: operations["createTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Task Detail */
+        get: operations["getTask"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Task
+         * @description Edit fields. New recurrence days apply to the remaining days only.
+         */
+        patch: operations["updateTask"];
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/drop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Drop Task
+         * @description Drop the task. Its remaining pending occurrences go; history is kept.
+         */
+        post: operations["dropTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Today */
+        get: operations["getToday"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/weeks/{monday}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Week
+         * @description Seven days of occurrences, the "any day" tray, adherence and totals.
+         */
+        get: operations["getWeek"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/weeks/{monday}/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Plan
+         * @description Plan backlog or existing tasks into a week; also adds every open recurring task's days.
+         */
+        post: operations["planWeek"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -25,6 +263,94 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** Adherence */
+        Adherence: {
+            /**
+             * Done
+             * @default 0
+             */
+            done: number;
+            /**
+             * Late
+             * @default 0
+             */
+            late: number;
+            /**
+             * Missed
+             * @default 0
+             */
+            missed: number;
+            /**
+             * Pending
+             * @default 0
+             */
+            pending: number;
+            /**
+             * Planned
+             * @default 0
+             */
+            planned: number;
+            /**
+             * Rate
+             * @description done / (planned - skipped)
+             */
+            rate?: number | null;
+            /**
+             * Skipped
+             * @default 0
+             */
+            skipped: number;
+            /** Task Id */
+            task_id: string;
+            /** Title */
+            title: string;
+        };
+        /** BacklogItem */
+        BacklogItem: {
+            /**
+             * Attempts
+             * @description Weeks the task was planned into
+             */
+            attempts: number;
+            /** Last Planned Week Start */
+            last_planned_week_start: string | null;
+            task: components["schemas"]["TaskRead"];
+        };
+        /** BacklogResponse */
+        BacklogResponse: {
+            /** Items */
+            items: components["schemas"]["BacklogItem"][];
+        };
+        /** CloseResult */
+        CloseResult: {
+            /** Activated Weeks */
+            activated_weeks: string[];
+            /** Closed Weeks */
+            closed_weeks: string[];
+            /** Missed */
+            missed: number;
+            /** Returned To Backlog */
+            returned_to_backlog: number;
+        };
+        /** ErrorDetail */
+        ErrorDetail: {
+            /** Field */
+            field?: string | null;
+            /** Message */
+            message: string;
+        };
+        /** ErrorResponse */
+        ErrorResponse: {
+            /** Code */
+            code: string;
+            /**
+             * Details
+             * @default []
+             */
+            details: components["schemas"]["ErrorDetail"][];
+            /** Message */
+            message: string;
+        };
         /** HealthResponse */
         HealthResponse: {
             /** Status */
@@ -32,6 +358,278 @@ export interface components {
             /** Version */
             version: string;
         };
+        /** OccurrenceRead */
+        OccurrenceRead: {
+            /** Carried Over */
+            carried_over: boolean;
+            /** Completed At */
+            completed_at: string | null;
+            /**
+             * Date
+             * @description Null means any day this week
+             */
+            date: string | null;
+            /** Id */
+            id: string;
+            /** Late */
+            late: boolean;
+            status: components["schemas"]["OccurrenceStatus"];
+            task: components["schemas"]["TaskSummary"];
+            /**
+             * Week Start
+             * Format: date
+             */
+            week_start: string;
+        };
+        /**
+         * OccurrenceStatus
+         * @enum {string}
+         */
+        OccurrenceStatus: "pending" | "done" | "missed" | "skipped";
+        /** OccurrenceUpdate */
+        OccurrenceUpdate: {
+            /**
+             * Date
+             * @description New day in the same week, or null for any day
+             */
+            date: string | null;
+        };
+        /** PlanItem */
+        PlanItem: {
+            /**
+             * Date
+             * @description A day in the week, or null for any day; recurring tasks use their days
+             */
+            date?: string | null;
+            /** Task Id */
+            task_id: string;
+        };
+        /** PlanTarget */
+        PlanTarget: {
+            /**
+             * Date
+             * @description A day in that week, or null for any day (one-off only)
+             */
+            date?: string | null;
+            /**
+             * Week Start
+             * Format: date
+             * @description Monday of the week to plan into
+             */
+            week_start: string;
+        };
+        /** PlanWeekRequest */
+        PlanWeekRequest: {
+            /**
+             * Items
+             * @default []
+             */
+            items: components["schemas"]["PlanItem"][];
+        };
+        /**
+         * Priority
+         * @enum {string}
+         */
+        Priority: "high" | "medium" | "low";
+        /** Tally */
+        Tally: {
+            /**
+             * Done
+             * @default 0
+             */
+            done: number;
+            /**
+             * Late
+             * @default 0
+             */
+            late: number;
+            /**
+             * Missed
+             * @default 0
+             */
+            missed: number;
+            /**
+             * Pending
+             * @default 0
+             */
+            pending: number;
+            /**
+             * Planned
+             * @default 0
+             */
+            planned: number;
+            /**
+             * Rate
+             * @description done / (planned - skipped)
+             */
+            rate?: number | null;
+            /**
+             * Skipped
+             * @default 0
+             */
+            skipped: number;
+        };
+        /** TaskCreate */
+        TaskCreate: {
+            /** @default one_off */
+            kind: components["schemas"]["TaskKind"];
+            /**
+             * Notes
+             * @default
+             */
+            notes: string;
+            /** @description Plan straight into a week; otherwise one-offs go to the backlog */
+            plan?: components["schemas"]["PlanTarget"] | null;
+            /** @default medium */
+            priority: components["schemas"]["Priority"];
+            /**
+             * Recurrence Days
+             * @description Recurring only
+             */
+            recurrence_days?: number[] | null;
+            /** Title */
+            title: string;
+        };
+        /** TaskDetailResponse */
+        TaskDetailResponse: {
+            /** @description This week's occurrence, if any */
+            current_occurrence: components["schemas"]["OccurrenceRead"] | null;
+            /**
+             * History
+             * @description Every occurrence, newest week first
+             */
+            history: components["schemas"]["OccurrenceRead"][];
+            task: components["schemas"]["TaskRead"];
+        };
+        /**
+         * TaskKind
+         * @enum {string}
+         */
+        TaskKind: "one_off" | "recurring";
+        /** TaskRead */
+        TaskRead: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** First Planned Week Start */
+            first_planned_week_start: string | null;
+            /** Id */
+            id: string;
+            /** In Backlog */
+            in_backlog: boolean;
+            kind: components["schemas"]["TaskKind"];
+            /** Notes */
+            notes: string;
+            priority: components["schemas"]["Priority"];
+            /** Recurrence Days */
+            recurrence_days: number[] | null;
+            status: components["schemas"]["TaskStatus"];
+            /** Title */
+            title: string;
+        };
+        /**
+         * TaskStatus
+         * @enum {string}
+         */
+        TaskStatus: "open" | "done" | "dropped";
+        /** TaskSummary */
+        TaskSummary: {
+            /** Id */
+            id: string;
+            kind: components["schemas"]["TaskKind"];
+            priority: components["schemas"]["Priority"];
+            /** Recurrence Days */
+            recurrence_days: number[] | null;
+            /** Title */
+            title: string;
+        };
+        /**
+         * TaskUpdate
+         * @description Fields left out stay as they are.
+         */
+        TaskUpdate: {
+            /** Notes */
+            notes?: string | null;
+            priority?: components["schemas"]["Priority"] | null;
+            /**
+             * Recurrence Days
+             * @description Recurring only; applies to remaining days
+             */
+            recurrence_days?: number[] | null;
+            /** Title */
+            title?: string | null;
+        };
+        /** TodayResponse */
+        TodayResponse: {
+            /** Adherence */
+            adherence: components["schemas"]["Adherence"][];
+            /**
+             * Any Day
+             * @description This week's any-day occurrences
+             */
+            any_day: components["schemas"]["OccurrenceRead"][];
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Iso Week */
+            iso_week: number;
+            /**
+             * Items
+             * @description Occurrences dated today
+             */
+            items: components["schemas"]["OccurrenceRead"][];
+            summary: components["schemas"]["Tally"];
+            /**
+             * Week Start
+             * Format: date
+             */
+            week_start: string;
+        };
+        /** WeekDay */
+        WeekDay: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Occurrences */
+            occurrences: components["schemas"]["OccurrenceRead"][];
+        };
+        /** WeekResponse */
+        WeekResponse: {
+            /**
+             * Adherence
+             * @description Recurring tasks only
+             */
+            adherence: components["schemas"]["Adherence"][];
+            /** Any Day */
+            any_day: components["schemas"]["OccurrenceRead"][];
+            /** Days */
+            days: components["schemas"]["WeekDay"][];
+            /** Iso Week */
+            iso_week: number;
+            status: components["schemas"]["WeekStatus"];
+            summary: components["schemas"]["Tally"];
+            /**
+             * Week End
+             * Format: date
+             */
+            week_end: string;
+            /**
+             * Week Start
+             * Format: date
+             */
+            week_start: string;
+        };
+        /**
+         * WeekStatus
+         * @enum {string}
+         */
+        WeekStatus: "planning" | "active" | "closed";
     };
     responses: never;
     parameters: never;
@@ -41,6 +639,656 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getBacklog: {
+        parameters: {
+            query?: {
+                priority?: components["schemas"]["Priority"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklogResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    runCloseJob: {
+        parameters: {
+            query?: {
+                /** @description Run as if it were this day. Testing only: a future day closes weeks early. */
+                as_of?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CloseResult"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    moveOccurrence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                occurrence_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OccurrenceUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OccurrenceRead"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    completeOccurrence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                occurrence_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OccurrenceRead"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    reopenOccurrence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                occurrence_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OccurrenceRead"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    skipOccurrence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                occurrence_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OccurrenceRead"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskDetailResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskDetailResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskDetailResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    dropTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskDetailResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getToday: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TodayResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getWeek: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                monday: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeekResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    planWeek: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                monday: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanWeekRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeekResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     getHealth: {
         parameters: {
             query?: never;

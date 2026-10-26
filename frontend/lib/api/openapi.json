@@ -1,6 +1,199 @@
 {
   "components": {
     "schemas": {
+      "Adherence": {
+        "properties": {
+          "done": {
+            "default": 0,
+            "title": "Done",
+            "type": "integer"
+          },
+          "late": {
+            "default": 0,
+            "title": "Late",
+            "type": "integer"
+          },
+          "missed": {
+            "default": 0,
+            "title": "Missed",
+            "type": "integer"
+          },
+          "pending": {
+            "default": 0,
+            "title": "Pending",
+            "type": "integer"
+          },
+          "planned": {
+            "default": 0,
+            "title": "Planned",
+            "type": "integer"
+          },
+          "rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "done / (planned - skipped)",
+            "title": "Rate"
+          },
+          "skipped": {
+            "default": 0,
+            "title": "Skipped",
+            "type": "integer"
+          },
+          "task_id": {
+            "title": "Task Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id",
+          "title"
+        ],
+        "title": "Adherence",
+        "type": "object"
+      },
+      "BacklogItem": {
+        "properties": {
+          "attempts": {
+            "description": "Weeks the task was planned into",
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "last_planned_week_start": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Planned Week Start"
+          },
+          "task": {
+            "$ref": "#/components/schemas/TaskRead"
+          }
+        },
+        "required": [
+          "task",
+          "last_planned_week_start",
+          "attempts"
+        ],
+        "title": "BacklogItem",
+        "type": "object"
+      },
+      "BacklogResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BacklogItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "BacklogResponse",
+        "type": "object"
+      },
+      "CloseResult": {
+        "properties": {
+          "activated_weeks": {
+            "items": {
+              "format": "date",
+              "type": "string"
+            },
+            "title": "Activated Weeks",
+            "type": "array"
+          },
+          "closed_weeks": {
+            "items": {
+              "format": "date",
+              "type": "string"
+            },
+            "title": "Closed Weeks",
+            "type": "array"
+          },
+          "missed": {
+            "title": "Missed",
+            "type": "integer"
+          },
+          "returned_to_backlog": {
+            "title": "Returned To Backlog",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "activated_weeks",
+          "closed_weeks",
+          "missed",
+          "returned_to_backlog"
+        ],
+        "title": "CloseResult",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "properties": {
+          "field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ErrorDetail"
+            },
+            "title": "Details",
+            "type": "array"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
       "HealthResponse": {
         "properties": {
           "status": {
@@ -18,6 +211,651 @@
         ],
         "title": "HealthResponse",
         "type": "object"
+      },
+      "OccurrenceRead": {
+        "properties": {
+          "carried_over": {
+            "title": "Carried Over",
+            "type": "boolean"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null means any day this week",
+            "title": "Date"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "late": {
+            "title": "Late",
+            "type": "boolean"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OccurrenceStatus"
+          },
+          "task": {
+            "$ref": "#/components/schemas/TaskSummary"
+          },
+          "week_start": {
+            "format": "date",
+            "title": "Week Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "task",
+          "week_start",
+          "date",
+          "status",
+          "late",
+          "completed_at",
+          "carried_over"
+        ],
+        "title": "OccurrenceRead",
+        "type": "object"
+      },
+      "OccurrenceStatus": {
+        "enum": [
+          "pending",
+          "done",
+          "missed",
+          "skipped"
+        ],
+        "title": "OccurrenceStatus",
+        "type": "string"
+      },
+      "OccurrenceUpdate": {
+        "properties": {
+          "date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New day in the same week, or null for any day",
+            "title": "Date"
+          }
+        },
+        "required": [
+          "date"
+        ],
+        "title": "OccurrenceUpdate",
+        "type": "object"
+      },
+      "PlanItem": {
+        "properties": {
+          "date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A day in the week, or null for any day; recurring tasks use their days",
+            "title": "Date"
+          },
+          "task_id": {
+            "title": "Task Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "title": "PlanItem",
+        "type": "object"
+      },
+      "PlanTarget": {
+        "properties": {
+          "date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A day in that week, or null for any day (one-off only)",
+            "title": "Date"
+          },
+          "week_start": {
+            "description": "Monday of the week to plan into",
+            "format": "date",
+            "title": "Week Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "week_start"
+        ],
+        "title": "PlanTarget",
+        "type": "object"
+      },
+      "PlanWeekRequest": {
+        "properties": {
+          "items": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PlanItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "PlanWeekRequest",
+        "type": "object"
+      },
+      "Priority": {
+        "enum": [
+          "high",
+          "medium",
+          "low"
+        ],
+        "title": "Priority",
+        "type": "string"
+      },
+      "Tally": {
+        "properties": {
+          "done": {
+            "default": 0,
+            "title": "Done",
+            "type": "integer"
+          },
+          "late": {
+            "default": 0,
+            "title": "Late",
+            "type": "integer"
+          },
+          "missed": {
+            "default": 0,
+            "title": "Missed",
+            "type": "integer"
+          },
+          "pending": {
+            "default": 0,
+            "title": "Pending",
+            "type": "integer"
+          },
+          "planned": {
+            "default": 0,
+            "title": "Planned",
+            "type": "integer"
+          },
+          "rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "done / (planned - skipped)",
+            "title": "Rate"
+          },
+          "skipped": {
+            "default": 0,
+            "title": "Skipped",
+            "type": "integer"
+          }
+        },
+        "title": "Tally",
+        "type": "object"
+      },
+      "TaskCreate": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/TaskKind",
+            "default": "one_off"
+          },
+          "notes": {
+            "default": "",
+            "title": "Notes",
+            "type": "string"
+          },
+          "plan": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanTarget"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Plan straight into a week; otherwise one-offs go to the backlog"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/Priority",
+            "default": "medium"
+          },
+          "recurrence_days": {
+            "anyOf": [
+              {
+                "items": {
+                  "maximum": 6.0,
+                  "minimum": 0.0,
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Recurring only",
+            "title": "Recurrence Days"
+          },
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "TaskCreate",
+        "type": "object"
+      },
+      "TaskDetailResponse": {
+        "properties": {
+          "current_occurrence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OccurrenceRead"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "This week's occurrence, if any"
+          },
+          "history": {
+            "description": "Every occurrence, newest week first",
+            "items": {
+              "$ref": "#/components/schemas/OccurrenceRead"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "task": {
+            "$ref": "#/components/schemas/TaskRead"
+          }
+        },
+        "required": [
+          "task",
+          "current_occurrence",
+          "history"
+        ],
+        "title": "TaskDetailResponse",
+        "type": "object"
+      },
+      "TaskKind": {
+        "enum": [
+          "one_off",
+          "recurring"
+        ],
+        "title": "TaskKind",
+        "type": "string"
+      },
+      "TaskRead": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "first_planned_week_start": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Planned Week Start"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "in_backlog": {
+            "title": "In Backlog",
+            "type": "boolean"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/TaskKind"
+          },
+          "notes": {
+            "title": "Notes",
+            "type": "string"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/Priority"
+          },
+          "recurrence_days": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recurrence Days"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "notes",
+          "kind",
+          "priority",
+          "recurrence_days",
+          "in_backlog",
+          "status",
+          "first_planned_week_start",
+          "created_at"
+        ],
+        "title": "TaskRead",
+        "type": "object"
+      },
+      "TaskStatus": {
+        "enum": [
+          "open",
+          "done",
+          "dropped"
+        ],
+        "title": "TaskStatus",
+        "type": "string"
+      },
+      "TaskSummary": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/TaskKind"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/Priority"
+          },
+          "recurrence_days": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recurrence Days"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "kind",
+          "priority",
+          "recurrence_days"
+        ],
+        "title": "TaskSummary",
+        "type": "object"
+      },
+      "TaskUpdate": {
+        "description": "Fields left out stay as they are.",
+        "properties": {
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Priority"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recurrence_days": {
+            "anyOf": [
+              {
+                "items": {
+                  "maximum": 6.0,
+                  "minimum": 0.0,
+                  "type": "integer"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Recurring only; applies to remaining days",
+            "title": "Recurrence Days"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "TaskUpdate",
+        "type": "object"
+      },
+      "TodayResponse": {
+        "properties": {
+          "adherence": {
+            "items": {
+              "$ref": "#/components/schemas/Adherence"
+            },
+            "title": "Adherence",
+            "type": "array"
+          },
+          "any_day": {
+            "description": "This week's any-day occurrences",
+            "items": {
+              "$ref": "#/components/schemas/OccurrenceRead"
+            },
+            "title": "Any Day",
+            "type": "array"
+          },
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "iso_week": {
+            "title": "Iso Week",
+            "type": "integer"
+          },
+          "items": {
+            "description": "Occurrences dated today",
+            "items": {
+              "$ref": "#/components/schemas/OccurrenceRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/Tally"
+          },
+          "week_start": {
+            "format": "date",
+            "title": "Week Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "week_start",
+          "iso_week",
+          "items",
+          "any_day",
+          "adherence",
+          "summary"
+        ],
+        "title": "TodayResponse",
+        "type": "object"
+      },
+      "WeekDay": {
+        "properties": {
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "occurrences": {
+            "items": {
+              "$ref": "#/components/schemas/OccurrenceRead"
+            },
+            "title": "Occurrences",
+            "type": "array"
+          }
+        },
+        "required": [
+          "date",
+          "occurrences"
+        ],
+        "title": "WeekDay",
+        "type": "object"
+      },
+      "WeekResponse": {
+        "properties": {
+          "adherence": {
+            "description": "Recurring tasks only",
+            "items": {
+              "$ref": "#/components/schemas/Adherence"
+            },
+            "title": "Adherence",
+            "type": "array"
+          },
+          "any_day": {
+            "items": {
+              "$ref": "#/components/schemas/OccurrenceRead"
+            },
+            "title": "Any Day",
+            "type": "array"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/WeekDay"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "iso_week": {
+            "title": "Iso Week",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/WeekStatus"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/Tally"
+          },
+          "week_end": {
+            "format": "date",
+            "title": "Week End",
+            "type": "string"
+          },
+          "week_start": {
+            "format": "date",
+            "title": "Week Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "week_start",
+          "week_end",
+          "iso_week",
+          "status",
+          "days",
+          "any_day",
+          "adherence",
+          "summary"
+        ],
+        "title": "WeekResponse",
+        "type": "object"
+      },
+      "WeekStatus": {
+        "enum": [
+          "planning",
+          "active",
+          "closed"
+        ],
+        "title": "WeekStatus",
+        "type": "string"
       }
     }
   },
@@ -27,6 +865,858 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/backlog": {
+      "get": {
+        "description": "Open one-off tasks not planned into any open week.",
+        "operationId": "getBacklog",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "priority",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Priority"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Priority"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BacklogResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Backlog",
+        "tags": [
+          "weeks"
+        ]
+      }
+    },
+    "/api/v1/jobs/close": {
+      "post": {
+        "description": "Run the close job now. It also runs at midnight and on startup.",
+        "operationId": "runCloseJob",
+        "parameters": [
+          {
+            "description": "Run as if it were this day. Testing only: a future day closes weeks early.",
+            "in": "query",
+            "name": "as_of",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Run as if it were this day. Testing only: a future day closes weeks early.",
+              "title": "As Of"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CloseResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Run Close Job",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/v1/occurrences/{occurrence_id}": {
+      "patch": {
+        "description": "Move to another remaining day of the same week, or to \"any day\".",
+        "operationId": "moveOccurrence",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "occurrence_id",
+            "required": true,
+            "schema": {
+              "title": "Occurrence Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OccurrenceUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OccurrenceRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Move",
+        "tags": [
+          "occurrences"
+        ]
+      }
+    },
+    "/api/v1/occurrences/{occurrence_id}/complete": {
+      "post": {
+        "description": "Mark done by hand. A missed occurrence is marked late.",
+        "operationId": "completeOccurrence",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "occurrence_id",
+            "required": true,
+            "schema": {
+              "title": "Occurrence Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OccurrenceRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Complete",
+        "tags": [
+          "occurrences"
+        ]
+      }
+    },
+    "/api/v1/occurrences/{occurrence_id}/reopen": {
+      "post": {
+        "description": "Undo a complete or skip.",
+        "operationId": "reopenOccurrence",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "occurrence_id",
+            "required": true,
+            "schema": {
+              "title": "Occurrence Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OccurrenceRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Reopen",
+        "tags": [
+          "occurrences"
+        ]
+      }
+    },
+    "/api/v1/occurrences/{occurrence_id}/skip": {
+      "post": {
+        "description": "Skip deliberately; skipped occurrences don't count against adherence.",
+        "operationId": "skipOccurrence",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "occurrence_id",
+            "required": true,
+            "schema": {
+              "title": "Occurrence Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OccurrenceRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Skip",
+        "tags": [
+          "occurrences"
+        ]
+      }
+    },
+    "/api/v1/tasks": {
+      "post": {
+        "description": "Create a task. Pass `plan` to put it straight into a week or day.",
+        "operationId": "createTask",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskDetailResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Create Task",
+        "tags": [
+          "tasks"
+        ]
+      }
+    },
+    "/api/v1/tasks/{task_id}": {
+      "get": {
+        "operationId": "getTask",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "required": true,
+            "schema": {
+              "title": "Task Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskDetailResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Task Detail",
+        "tags": [
+          "tasks"
+        ]
+      },
+      "patch": {
+        "description": "Edit fields. New recurrence days apply to the remaining days only.",
+        "operationId": "updateTask",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "required": true,
+            "schema": {
+              "title": "Task Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskDetailResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Update Task",
+        "tags": [
+          "tasks"
+        ]
+      }
+    },
+    "/api/v1/tasks/{task_id}/drop": {
+      "post": {
+        "description": "Drop the task. Its remaining pending occurrences go; history is kept.",
+        "operationId": "dropTask",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "required": true,
+            "schema": {
+              "title": "Task Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskDetailResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Drop Task",
+        "tags": [
+          "tasks"
+        ]
+      }
+    },
+    "/api/v1/today": {
+      "get": {
+        "operationId": "getToday",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodayResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Today",
+        "tags": [
+          "weeks"
+        ]
+      }
+    },
+    "/api/v1/weeks/{monday}": {
+      "get": {
+        "description": "Seven days of occurrences, the \"any day\" tray, adherence and totals.",
+        "operationId": "getWeek",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "monday",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "Monday",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeekResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Week",
+        "tags": [
+          "weeks"
+        ]
+      }
+    },
+    "/api/v1/weeks/{monday}/plan": {
+      "post": {
+        "description": "Plan backlog or existing tasks into a week; also adds every open recurring task's days.",
+        "operationId": "planWeek",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "monday",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "Monday",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanWeekRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeekResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Plan",
+        "tags": [
+          "weeks"
+        ]
+      }
+    },
     "/health": {
       "get": {
         "operationId": "getHealth",
