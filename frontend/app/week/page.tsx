@@ -1,3 +1,13 @@
+import { Suspense } from "react";
+
+import { Loading } from "@/components/screen-state";
+import { WeekScreen } from "@/components/screens/week";
+
 export default function WeekPage() {
-  return <h1 className="text-2xl font-semibold">Week</h1>;
+  // The week comes from ?start=, which is only known in the browser.
+  return (
+    <Suspense fallback={<Loading />}>
+      <WeekScreen />
+    </Suspense>
+  );
 }
