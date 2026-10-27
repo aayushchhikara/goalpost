@@ -4,27 +4,22 @@
       "Adherence": {
         "properties": {
           "done": {
-            "default": 0,
             "title": "Done",
             "type": "integer"
           },
           "late": {
-            "default": 0,
             "title": "Late",
             "type": "integer"
           },
           "missed": {
-            "default": 0,
             "title": "Missed",
             "type": "integer"
           },
           "pending": {
-            "default": 0,
             "title": "Pending",
             "type": "integer"
           },
           "planned": {
-            "default": 0,
             "title": "Planned",
             "type": "integer"
           },
@@ -37,11 +32,10 @@
                 "type": "null"
               }
             ],
-            "description": "done / (planned - skipped)",
+            "description": "done / (planned - skipped); null when nothing counts",
             "title": "Rate"
           },
           "skipped": {
-            "default": 0,
             "title": "Skipped",
             "type": "integer"
           },
@@ -55,6 +49,13 @@
           }
         },
         "required": [
+          "planned",
+          "done",
+          "late",
+          "skipped",
+          "missed",
+          "pending",
+          "rate",
           "task_id",
           "title"
         ],
@@ -175,7 +176,6 @@
             "type": "string"
           },
           "details": {
-            "default": [],
             "items": {
               "$ref": "#/components/schemas/ErrorDetail"
             },
@@ -189,7 +189,8 @@
         },
         "required": [
           "code",
-          "message"
+          "message",
+          "details"
         ],
         "title": "ErrorResponse",
         "type": "object"
@@ -388,27 +389,22 @@
       "Tally": {
         "properties": {
           "done": {
-            "default": 0,
             "title": "Done",
             "type": "integer"
           },
           "late": {
-            "default": 0,
             "title": "Late",
             "type": "integer"
           },
           "missed": {
-            "default": 0,
             "title": "Missed",
             "type": "integer"
           },
           "pending": {
-            "default": 0,
             "title": "Pending",
             "type": "integer"
           },
           "planned": {
-            "default": 0,
             "title": "Planned",
             "type": "integer"
           },
@@ -421,15 +417,23 @@
                 "type": "null"
               }
             ],
-            "description": "done / (planned - skipped)",
+            "description": "done / (planned - skipped); null when nothing counts",
             "title": "Rate"
           },
           "skipped": {
-            "default": 0,
             "title": "Skipped",
             "type": "integer"
           }
         },
+        "required": [
+          "planned",
+          "done",
+          "late",
+          "skipped",
+          "missed",
+          "pending",
+          "rate"
+        ],
         "title": "Tally",
         "type": "object"
       },
