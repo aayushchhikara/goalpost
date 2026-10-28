@@ -10,6 +10,7 @@ from goalpost.db import get_engine
 from goalpost.errors import install_error_handlers
 from goalpost.migrate import run_migrations
 from goalpost.scheduler import run_close_job, start_scheduler
+from goalpost.security import LocalOnlyMiddleware
 from goalpost.services.settings import ensure_settings
 from goalpost.settings import get_settings
 
@@ -33,6 +34,12 @@ def create_app() -> FastAPI:
         allow_origins=[settings.frontend_origin],
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
         allow_headers=["*"],
+    )
+    # Added last so it runs first: refuse foreign hosts and cross-site writes before anything else.
+    app.add_middleware(
+        LocalOnlyMiddleware,
+        allowed_hosts=settings.allowed_hosts,
+        allowed_origins=[settings.frontend_origin],
     )
     install_error_handlers(app)
     app.include_router(health.router)
