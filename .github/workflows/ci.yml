@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
 
+# The jobs only check out and test code, so the token needs nothing beyond read access.
+permissions:
+  contents: read
+
 jobs:
   backend:
     runs-on: ubuntu-latest
