@@ -40,7 +40,7 @@ importers:
         version: 4.22.1(supports-color@10.2.2)
       swr:
         specifier: ^2.5.1
-        version: 2.5.1(react@19.3.0)
+        version: 2.5.1(react@19.3.1)
       tailwind-merge:
         specifier: ^3.7.0
         version: 3.7.0
@@ -6490,11 +6490,11 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  swr@2.5.1(react@19.3.0):
+  swr@2.5.1(react@19.3.1):
     dependencies:
       dequal: 2.0.3
-      react: 19.3.0
-      use-sync-external-store: 1.7.0(react@19.3.0)
+      react: 19.3.1
+      use-sync-external-store: 1.7.0(react@19.3.1)
 
   systeminformation@5.33.16: {}
 
