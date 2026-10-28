@@ -7,6 +7,8 @@ services:
     environment:
       GOALPOST_DATABASE_URL: sqlite:////data/goalpost.db
       GOALPOST_FRONTEND_ORIGIN: http://localhost:3000
+      # The frontend container calls the API server-side as http://backend:8000.
+      GOALPOST_ALLOWED_HOSTS: localhost,127.0.0.1,backend
     ports:
       - "127.0.0.1:8000:8000"
     volumes:

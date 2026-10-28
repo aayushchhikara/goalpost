@@ -21,6 +21,8 @@ class Settings(BaseSettings):
         default=f"sqlite:///{REPO_ROOT / 'data' / 'goalpost.db'}", alias="GOALPOST_DATABASE_URL"
     )
     frontend_origin: str = Field(default="http://localhost:3000", alias="GOALPOST_FRONTEND_ORIGIN")
+    # Comma-separated host names the API answers to; anything else is refused (DNS rebinding).
+    allowed_hosts_csv: str = Field(default="localhost,127.0.0.1", alias="GOALPOST_ALLOWED_HOSTS")
     github_token: str = Field(default="", alias="GITHUB_TOKEN")
     google_client_id: str = Field(default="", alias="GOOGLE_CLIENT_ID")
     google_client_secret: str = Field(default="", alias="GOOGLE_CLIENT_SECRET")
@@ -34,6 +36,10 @@ class Settings(BaseSettings):
         except (ZoneInfoNotFoundError, ValueError) as exc:
             raise ValueError(f"unknown IANA timezone {value!r}, e.g. Asia/Kolkata") from exc
         return value
+
+    @property
+    def allowed_hosts(self) -> list[str]:
+        return [h.strip() for h in self.allowed_hosts_csv.split(",") if h.strip()]
 
 
 @lru_cache

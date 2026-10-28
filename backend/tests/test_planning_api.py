@@ -1,43 +1,12 @@
-from collections.abc import Iterator
 from datetime import UTC, datetime
 from typing import Any
 
-import pytest
 from fastapi.testclient import TestClient
-from goalpost.api.deps import get_now
-from goalpost.db import get_session, make_engine
-from goalpost.main import app
-from sqlalchemy.orm import sessionmaker
 
 API = "/api/v1"
 
 
-class Clock:
-    now = datetime(2026, 10, 26, 9, 0, tzinfo=UTC)  # Monday of week 44 (settings timezone is UTC)
-
-
-@pytest.fixture
-def clock() -> Clock:
-    return Clock()
-
-
-@pytest.fixture
-def client(db_url: str, clock: Clock) -> Iterator[TestClient]:
-    engine = make_engine(db_url)
-    make_session = sessionmaker(engine, expire_on_commit=False)
-
-    def session() -> Iterator[Any]:
-        with make_session() as s:
-            yield s
-
-    app.dependency_overrides[get_session] = session
-    app.dependency_overrides[get_now] = lambda: clock.now
-    yield TestClient(app)  # no lifespan: no scheduler, and the test database is already migrated
-    app.dependency_overrides.clear()
-    engine.dispose()
-
-
-def test_plan_a_week_complete_things_and_fill_the_backlog(client: TestClient, clock: Clock) -> None:
+def test_plan_a_week_complete_things_and_fill_the_backlog(client: TestClient, clock: Any) -> None:
     # A one-off idea goes to the backlog.
     resp = client.post(f"{API}/tasks", json={"title": "Write CONTRIBUTING guide"})
     assert resp.status_code == 201
