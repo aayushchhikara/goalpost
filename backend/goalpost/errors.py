@@ -66,7 +66,7 @@ async def _validation_error(_request: Request, exc: Exception) -> JSONResponse:
 async def _http_error(_request: Request, exc: Exception) -> JSONResponse:
     assert isinstance(exc, StarletteHTTPException)
     code = HTTPStatus(exc.status_code).phrase.lower().replace(" ", "_")
-    return _json(exc.status_code, ErrorResponse(code=code, message=str(exc.detail)))
+    return _json(exc.status_code, ErrorResponse(code=code, message=str(exc.detail), details=[]))
 
 
 def install_error_handlers(app: FastAPI) -> None:

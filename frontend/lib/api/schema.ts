@@ -265,40 +265,22 @@ export interface components {
     schemas: {
         /** Adherence */
         Adherence: {
-            /**
-             * Done
-             * @default 0
-             */
+            /** Done */
             done: number;
-            /**
-             * Late
-             * @default 0
-             */
+            /** Late */
             late: number;
-            /**
-             * Missed
-             * @default 0
-             */
+            /** Missed */
             missed: number;
-            /**
-             * Pending
-             * @default 0
-             */
+            /** Pending */
             pending: number;
-            /**
-             * Planned
-             * @default 0
-             */
+            /** Planned */
             planned: number;
             /**
              * Rate
-             * @description done / (planned - skipped)
+             * @description done / (planned - skipped); null when nothing counts
              */
-            rate?: number | null;
-            /**
-             * Skipped
-             * @default 0
-             */
+            rate: number | null;
+            /** Skipped */
             skipped: number;
             /** Task Id */
             task_id: string;
@@ -343,10 +325,7 @@ export interface components {
         ErrorResponse: {
             /** Code */
             code: string;
-            /**
-             * Details
-             * @default []
-             */
+            /** Details */
             details: components["schemas"]["ErrorDetail"][];
             /** Message */
             message: string;
@@ -424,7 +403,7 @@ export interface components {
              * Items
              * @default []
              */
-            items: components["schemas"]["PlanItem"][];
+            items?: components["schemas"]["PlanItem"][];
         };
         /**
          * Priority
@@ -433,55 +412,37 @@ export interface components {
         Priority: "high" | "medium" | "low";
         /** Tally */
         Tally: {
-            /**
-             * Done
-             * @default 0
-             */
+            /** Done */
             done: number;
-            /**
-             * Late
-             * @default 0
-             */
+            /** Late */
             late: number;
-            /**
-             * Missed
-             * @default 0
-             */
+            /** Missed */
             missed: number;
-            /**
-             * Pending
-             * @default 0
-             */
+            /** Pending */
             pending: number;
-            /**
-             * Planned
-             * @default 0
-             */
+            /** Planned */
             planned: number;
             /**
              * Rate
-             * @description done / (planned - skipped)
+             * @description done / (planned - skipped); null when nothing counts
              */
-            rate?: number | null;
-            /**
-             * Skipped
-             * @default 0
-             */
+            rate: number | null;
+            /** Skipped */
             skipped: number;
         };
         /** TaskCreate */
         TaskCreate: {
             /** @default one_off */
-            kind: components["schemas"]["TaskKind"];
+            kind?: components["schemas"]["TaskKind"];
             /**
              * Notes
              * @default
              */
-            notes: string;
+            notes?: string;
             /** @description Plan straight into a week; otherwise one-offs go to the backlog */
             plan?: components["schemas"]["PlanTarget"] | null;
             /** @default medium */
-            priority: components["schemas"]["Priority"];
+            priority?: components["schemas"]["Priority"];
             /**
              * Recurrence Days
              * @description Recurring only

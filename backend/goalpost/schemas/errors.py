@@ -9,4 +9,4 @@ class ErrorDetail(BaseModel):
 class ErrorResponse(BaseModel):
     code: str
     message: str
-    details: list[ErrorDetail] = []
+    details: list[ErrorDetail]

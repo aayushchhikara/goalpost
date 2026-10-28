@@ -124,13 +124,13 @@ class OccurrenceRead(BaseModel):
 
 
 class Tally(BaseModel):
-    planned: int = 0
-    done: int = 0
-    late: int = 0
-    skipped: int = 0
-    missed: int = 0
-    pending: int = 0
-    rate: float | None = Field(default=None, description="done / (planned - skipped)")
+    planned: int
+    done: int
+    late: int
+    skipped: int
+    missed: int
+    pending: int
+    rate: float | None = Field(description="done / (planned - skipped); null when nothing counts")
 
 
 class Adherence(Tally):
