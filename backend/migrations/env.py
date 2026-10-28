@@ -10,7 +10,11 @@ target_metadata = Base.metadata
 def run_migrations_online() -> None:
     engine = create_engine(config.get_main_option("sqlalchemy.url"))
     with engine.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            render_as_batch=True,  # SQLite can only ALTER through table rebuilds
+        )
         with context.begin_transaction():
             context.run_migrations()
 

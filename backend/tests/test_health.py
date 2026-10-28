@@ -1,10 +1,5 @@
-import os
-import tempfile
-
-os.environ["GOALPOST_DATABASE_URL"] = f"sqlite:///{tempfile.mkdtemp()}/test.db"
-
-from fastapi.testclient import TestClient  # noqa: E402
-from goalpost.main import app  # noqa: E402
+from fastapi.testclient import TestClient
+from goalpost.main import app
 
 
 def test_health() -> None:

@@ -12,6 +12,8 @@ dependencies = [
   "pydantic-settings>=2.4",
   "apscheduler>=3.10",
   "cryptography>=43",
+  "python-ulid>=3.0",
+  "tzdata>=2024.1",
 ]
 
 [build-system]
