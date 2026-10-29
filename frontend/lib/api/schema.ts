@@ -24,6 +24,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/connector-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Connector Types
+         * @description Installed connectors: config schema, secrets needed, event kinds and rule fields.
+         */
+        get: operations["getConnectorTypes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connectors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Connectors
+         * @description Your connector instances with status and last sync.
+         */
+        get: operations["getConnectors"];
+        put?: never;
+        /**
+         * Create Connector
+         * @description Add an instance of an installed connector type. Secrets stay in .env.
+         */
+        post: operations["createConnector"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connectors/{connector_id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test Connector
+         * @description Run the connector's connection test. A failure is a normal result, not an error.
+         */
+        post: operations["testConnector"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/jobs/close": {
         parameters: {
             query?: never;
@@ -118,6 +182,66 @@ export interface paths {
          * @description Skip deliberately; skipped occurrences don't count against adherence.
          */
         post: operations["skipOccurrence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Status
+         * @description Sidebar summary: inbox and backlog counts, last and next sync, connector errors.
+         */
+        get: operations["getStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Sync
+         * @description Sync now: one connector, or every enabled one. Returns at once; poll /status.
+         */
+        post: operations["startSync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sync/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Sync Runs
+         * @description Sync history, newest first.
+         */
+        get: operations["getSyncRuns"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -287,6 +411,11 @@ export interface components {
             /** Title */
             title: string;
         };
+        /**
+         * AuthKind
+         * @enum {string}
+         */
+        AuthKind: "none" | "token" | "oauth2";
         /** BacklogItem */
         BacklogItem: {
             /**
@@ -314,6 +443,130 @@ export interface components {
             /** Returned To Backlog */
             returned_to_backlog: number;
         };
+        /** ConnectorCreate */
+        ConnectorCreate: {
+            /** Config */
+            config?: {
+                [key: string]: unknown;
+            };
+            /**
+             * Name
+             * @description Defaults to the type's name
+             */
+            name?: string | null;
+            /**
+             * Secret Ref
+             * @description The .env key holding the secret, if not the type's default
+             */
+            secret_ref?: string | null;
+            /**
+             * Type
+             * @description A connector type id, e.g. leetcode
+             */
+            type: string;
+        };
+        /** ConnectorLoadProblem */
+        ConnectorLoadProblem: {
+            /** Folder */
+            folder: string;
+            /** Message */
+            message: string;
+        };
+        /** ConnectorProblem */
+        ConnectorProblem: {
+            /** Connector Id */
+            connector_id: string;
+            /** Message */
+            message: string;
+            /** Name */
+            name: string;
+            /** Paused */
+            paused: boolean;
+        };
+        /** ConnectorRead */
+        ConnectorRead: {
+            /** Config */
+            config: {
+                [key: string]: unknown;
+            };
+            /** Enabled */
+            enabled: boolean;
+            /** Id */
+            id: string;
+            last_run: components["schemas"]["SyncRunRead"] | null;
+            /** Last Success At */
+            last_success_at: string | null;
+            /** Name */
+            name: string;
+            /**
+             * Pause Reason
+             * @description Set when an auth error paused the connector
+             */
+            pause_reason: string | null;
+            /** Secret Ref */
+            secret_ref: string | null;
+            status: components["schemas"]["ConnectorStatus"];
+            /** Type */
+            type: string;
+        };
+        /**
+         * ConnectorStatus
+         * @enum {string}
+         */
+        ConnectorStatus: "never_synced" | "syncing" | "ok" | "failing" | "paused" | "disabled";
+        /** ConnectorTestResult */
+        ConnectorTestResult: {
+            /** Message */
+            message: string;
+            /** Ok */
+            ok: boolean;
+        };
+        /** ConnectorTypeRead */
+        ConnectorTypeRead: {
+            auth: components["schemas"]["AuthKind"];
+            /** Capabilities */
+            capabilities: string[];
+            /**
+             * Config Schema
+             * @description JSON Schema for the setup form
+             */
+            config_schema: {
+                [key: string]: unknown;
+            };
+            /** Description */
+            description: string;
+            /** Event Kinds */
+            event_kinds: components["schemas"]["EventKindRead"][];
+            /** Icon */
+            icon: string;
+            /** Id */
+            id: string;
+            /** Max Items */
+            max_items: number;
+            /** Min Sync Interval Minutes */
+            min_sync_interval_minutes: number;
+            /** Name */
+            name: string;
+            /** Secrets */
+            secrets: components["schemas"]["SecretRequirement"][];
+            /** Version */
+            version: string;
+        };
+        /** ConnectorTypesResponse */
+        ConnectorTypesResponse: {
+            /** Items */
+            items: components["schemas"]["ConnectorTypeRead"][];
+            /**
+             * Load Errors
+             * @description Connector folders that failed to load
+             */
+            load_errors: components["schemas"]["ConnectorLoadProblem"][];
+        };
+        /** ConnectorsResponse */
+        ConnectorsResponse: {
+            /** Items */
+            items: components["schemas"]["ConnectorRead"][];
+        };
         /** ErrorDetail */
         ErrorDetail: {
             /** Field */
@@ -329,6 +582,19 @@ export interface components {
             details: components["schemas"]["ErrorDetail"][];
             /** Message */
             message: string;
+        };
+        /** EventKindRead */
+        EventKindRead: {
+            /** Description */
+            description: string;
+            /** Name */
+            name: string;
+            /** Payload Schema */
+            payload_schema: {
+                [key: string]: unknown;
+            };
+            /** Rule Fields */
+            rule_fields: string[];
         };
         /** HealthResponse */
         HealthResponse: {
@@ -410,6 +676,94 @@ export interface components {
          * @enum {string}
          */
         Priority: "high" | "medium" | "low";
+        /** SecretRequirement */
+        SecretRequirement: {
+            /**
+             * Name
+             * @description The .env key
+             */
+            name: string;
+            /**
+             * Present
+             * @description Whether the key is set in .env or the environment
+             */
+            present: boolean;
+        };
+        /** StatusResponse */
+        StatusResponse: {
+            /** Backlog Count */
+            backlog_count: number;
+            /** Connector Errors */
+            connector_errors: components["schemas"]["ConnectorProblem"][];
+            /**
+             * Inbox Count
+             * @description Pending suggestions in the Proof Inbox
+             */
+            inbox_count: number;
+            /** Last Sync At */
+            last_sync_at: string | null;
+            /** Next Sync At */
+            next_sync_at: string | null;
+            /** Syncing */
+            syncing: boolean;
+        };
+        /** SyncRequest */
+        SyncRequest: {
+            /**
+             * Connector Id
+             * @description Omit to sync every connector
+             */
+            connector_id?: string | null;
+        };
+        /** SyncRunRead */
+        SyncRunRead: {
+            /** Connector Id */
+            connector_id: string;
+            /** Error */
+            error: string | null;
+            /** Events Added */
+            events_added: number;
+            /** Finished At */
+            finished_at: string | null;
+            /** Id */
+            id: string;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** @description Null while the run is in progress */
+            status: components["schemas"]["SyncStatus"] | null;
+            trigger: components["schemas"]["SyncTrigger"];
+        };
+        /** SyncRunsResponse */
+        SyncRunsResponse: {
+            /** Items */
+            items: components["schemas"]["SyncRunRead"][];
+            /**
+             * Next Before
+             * @description Pass as `before` to get older runs
+             */
+            next_before: string | null;
+        };
+        /** SyncStarted */
+        SyncStarted: {
+            /**
+             * Connector Ids
+             * @description Connectors queued for this sync
+             */
+            connector_ids: string[];
+        };
+        /**
+         * SyncStatus
+         * @enum {string}
+         */
+        SyncStatus: "ok" | "partial" | "failed";
+        /**
+         * SyncTrigger
+         * @enum {string}
+         */
+        SyncTrigger: "startup" | "schedule" | "manual";
         /** Tally */
         Tally: {
             /** Done */
@@ -618,6 +972,200 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BacklogResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getConnectorTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorTypesResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getConnectors: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorsResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createConnector: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnectorCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorRead"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    testConnector: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connector_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorTestResult"];
                 };
             };
             /** @description Not Found */
@@ -868,6 +1416,156 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OccurrenceRead"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    startSync: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SyncRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyncStarted"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getSyncRuns: {
+        parameters: {
+            query?: {
+                connector_id?: string | null;
+                /** @description next_before from the previous page */
+                before?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyncRunsResponse"];
                 };
             };
             /** @description Not Found */

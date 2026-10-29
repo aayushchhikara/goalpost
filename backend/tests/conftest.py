@@ -3,7 +3,6 @@ import tempfile
 from collections.abc import Iterator
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -13,7 +12,7 @@ os.environ.setdefault("GOALPOST_DATABASE_URL", f"sqlite:///{tempfile.mkdtemp()}/
 
 from fastapi.testclient import TestClient  # noqa: E402
 from goalpost.api.deps import get_now  # noqa: E402
-from goalpost.db import get_session, make_engine  # noqa: E402
+from goalpost.db import get_session_factory, make_engine  # noqa: E402
 from goalpost.main import app  # noqa: E402
 from goalpost.migrate import run_migrations  # noqa: E402
 from sqlalchemy.orm import Session, sessionmaker  # noqa: E402
@@ -52,12 +51,7 @@ def client(db_url: str, clock: Clock) -> Iterator[TestClient]:
     """The API on a fresh database with a frozen clock. No lifespan, so no scheduler."""
     engine = make_engine(db_url)
     make_session = sessionmaker(engine, expire_on_commit=False)
-
-    def session() -> Iterator[Any]:
-        with make_session() as s:
-            yield s
-
-    app.dependency_overrides[get_session] = session
+    app.dependency_overrides[get_session_factory] = lambda: make_session
     app.dependency_overrides[get_now] = lambda: clock.now
     yield TestClient(app, base_url=BASE_URL)
     app.dependency_overrides.clear()

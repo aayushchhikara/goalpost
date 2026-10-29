@@ -1,4 +1,3 @@
-from collections.abc import Iterator
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -42,6 +41,6 @@ def get_engine() -> Engine:
     return make_engine(get_settings().database_url)
 
 
-def get_session() -> Iterator[Session]:
-    with sessionmaker(get_engine(), expire_on_commit=False)() as session:
-        yield session
+def get_session_factory() -> sessionmaker[Session]:
+    """Sessions for the configured database. Tests override this to use their own database."""
+    return sessionmaker(get_engine(), expire_on_commit=False)
