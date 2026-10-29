@@ -1,0 +1,11 @@
+{
+  "errors": [
+    {
+      "message": "That user does not exist.",
+      "locations": [{ "line": 1, "column": 22 }],
+      "path": ["matchedUser"],
+      "extensions": { "handled": true, "skip_sentry": true }
+    }
+  ],
+  "data": { "matchedUser": null, "recentAcSubmissionList": [] }
+}
