@@ -17,6 +17,11 @@ goalpost = { workspace = true }
 [dependency-groups]
 dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.6", "pyright>=1.1.380", "pre-commit>=3.8"]
 
+[tool.pytest.ini_options]
+testpaths = ["backend/tests", "connectors"]
+# Every connector has a test_connector.py, so test modules can't share one import namespace.
+addopts = "--import-mode=importlib"
+
 [tool.ruff]
 line-length = 100
 target-version = "py312"
@@ -25,7 +30,7 @@ target-version = "py312"
 select = ["E", "F", "I", "B", "UP"]
 
 [tool.pyright]
-include = ["backend"]
+include = ["backend", "connectors"]
 exclude = ["backend/migrations"]
 venvPath = "."
 venv = ".venv"
