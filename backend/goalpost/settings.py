@@ -21,6 +21,7 @@ class Settings(BaseSettings):
         default=f"sqlite:///{REPO_ROOT / 'data' / 'goalpost.db'}", alias="GOALPOST_DATABASE_URL"
     )
     frontend_origin: str = Field(default="http://localhost:3000", alias="GOALPOST_FRONTEND_ORIGIN")
+    connectors_dir: Path = Field(default=REPO_ROOT / "connectors", alias="GOALPOST_CONNECTORS_DIR")
     # Comma-separated host names the API answers to; anything else is refused (DNS rebinding).
     allowed_hosts_csv: str = Field(default="localhost,127.0.0.1", alias="GOALPOST_ALLOWED_HOSTS")
     github_token: str = Field(default="", alias="GITHUB_TOKEN")

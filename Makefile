@@ -14,7 +14,7 @@ dev-frontend:
 	cd frontend && pnpm dev
 
 test:
-	uv run pytest backend
+	uv run pytest
 	cd frontend && pnpm test
 
 lint:

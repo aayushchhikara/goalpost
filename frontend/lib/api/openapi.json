@@ -62,6 +62,15 @@
         "title": "Adherence",
         "type": "object"
       },
+      "AuthKind": {
+        "enum": [
+          "none",
+          "token",
+          "oauth2"
+        ],
+        "title": "AuthKind",
+        "type": "string"
+      },
       "BacklogItem": {
         "properties": {
           "attempts": {
@@ -145,6 +154,331 @@
         "title": "CloseResult",
         "type": "object"
       },
+      "ConnectorCreate": {
+        "properties": {
+          "config": {
+            "additionalProperties": true,
+            "title": "Config",
+            "type": "object"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Defaults to the type's name",
+            "title": "Name"
+          },
+          "secret_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The .env key holding the secret, if not the type's default",
+            "title": "Secret Ref"
+          },
+          "type": {
+            "description": "A connector type id, e.g. leetcode",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "ConnectorCreate",
+        "type": "object"
+      },
+      "ConnectorLoadProblem": {
+        "properties": {
+          "folder": {
+            "title": "Folder",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "folder",
+          "message"
+        ],
+        "title": "ConnectorLoadProblem",
+        "type": "object"
+      },
+      "ConnectorProblem": {
+        "properties": {
+          "connector_id": {
+            "title": "Connector Id",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "paused": {
+            "title": "Paused",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "connector_id",
+          "name",
+          "message",
+          "paused"
+        ],
+        "title": "ConnectorProblem",
+        "type": "object"
+      },
+      "ConnectorRead": {
+        "properties": {
+          "config": {
+            "additionalProperties": true,
+            "title": "Config",
+            "type": "object"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "last_run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SyncRunRead"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "last_success_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Success At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "pause_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set when an auth error paused the connector",
+            "title": "Pause Reason"
+          },
+          "secret_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secret Ref"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ConnectorStatus"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "name",
+          "config",
+          "secret_ref",
+          "enabled",
+          "pause_reason",
+          "status",
+          "last_run",
+          "last_success_at"
+        ],
+        "title": "ConnectorRead",
+        "type": "object"
+      },
+      "ConnectorStatus": {
+        "enum": [
+          "never_synced",
+          "syncing",
+          "ok",
+          "failing",
+          "paused",
+          "disabled"
+        ],
+        "title": "ConnectorStatus",
+        "type": "string"
+      },
+      "ConnectorTestResult": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok",
+          "message"
+        ],
+        "title": "ConnectorTestResult",
+        "type": "object"
+      },
+      "ConnectorTypeRead": {
+        "properties": {
+          "auth": {
+            "$ref": "#/components/schemas/AuthKind"
+          },
+          "capabilities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Capabilities",
+            "type": "array"
+          },
+          "config_schema": {
+            "additionalProperties": true,
+            "description": "JSON Schema for the setup form",
+            "title": "Config Schema",
+            "type": "object"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "event_kinds": {
+            "items": {
+              "$ref": "#/components/schemas/EventKindRead"
+            },
+            "title": "Event Kinds",
+            "type": "array"
+          },
+          "icon": {
+            "title": "Icon",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "max_items": {
+            "title": "Max Items",
+            "type": "integer"
+          },
+          "min_sync_interval_minutes": {
+            "title": "Min Sync Interval Minutes",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "secrets": {
+            "items": {
+              "$ref": "#/components/schemas/SecretRequirement"
+            },
+            "title": "Secrets",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "version",
+          "description",
+          "icon",
+          "auth",
+          "config_schema",
+          "secrets",
+          "event_kinds",
+          "min_sync_interval_minutes",
+          "max_items",
+          "capabilities"
+        ],
+        "title": "ConnectorTypeRead",
+        "type": "object"
+      },
+      "ConnectorTypesResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectorTypeRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "load_errors": {
+            "description": "Connector folders that failed to load",
+            "items": {
+              "$ref": "#/components/schemas/ConnectorLoadProblem"
+            },
+            "title": "Load Errors",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items",
+          "load_errors"
+        ],
+        "title": "ConnectorTypesResponse",
+        "type": "object"
+      },
+      "ConnectorsResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectorRead"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ConnectorsResponse",
+        "type": "object"
+      },
       "ErrorDetail": {
         "properties": {
           "field": {
@@ -193,6 +527,38 @@
           "details"
         ],
         "title": "ErrorResponse",
+        "type": "object"
+      },
+      "EventKindRead": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "payload_schema": {
+            "additionalProperties": true,
+            "title": "Payload Schema",
+            "type": "object"
+          },
+          "rule_fields": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Rule Fields",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "payload_schema",
+          "rule_fields"
+        ],
+        "title": "EventKindRead",
         "type": "object"
       },
       "HealthResponse": {
@@ -384,6 +750,236 @@
           "low"
         ],
         "title": "Priority",
+        "type": "string"
+      },
+      "SecretRequirement": {
+        "properties": {
+          "name": {
+            "description": "The .env key",
+            "title": "Name",
+            "type": "string"
+          },
+          "present": {
+            "description": "Whether the key is set in .env or the environment",
+            "title": "Present",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "present"
+        ],
+        "title": "SecretRequirement",
+        "type": "object"
+      },
+      "StatusResponse": {
+        "properties": {
+          "backlog_count": {
+            "title": "Backlog Count",
+            "type": "integer"
+          },
+          "connector_errors": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectorProblem"
+            },
+            "title": "Connector Errors",
+            "type": "array"
+          },
+          "inbox_count": {
+            "description": "Pending suggestions in the Proof Inbox",
+            "title": "Inbox Count",
+            "type": "integer"
+          },
+          "last_sync_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Sync At"
+          },
+          "next_sync_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Sync At"
+          },
+          "syncing": {
+            "title": "Syncing",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "inbox_count",
+          "backlog_count",
+          "syncing",
+          "last_sync_at",
+          "next_sync_at",
+          "connector_errors"
+        ],
+        "title": "StatusResponse",
+        "type": "object"
+      },
+      "SyncRequest": {
+        "properties": {
+          "connector_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Omit to sync every connector",
+            "title": "Connector Id"
+          }
+        },
+        "title": "SyncRequest",
+        "type": "object"
+      },
+      "SyncRunRead": {
+        "properties": {
+          "connector_id": {
+            "title": "Connector Id",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "events_added": {
+            "title": "Events Added",
+            "type": "integer"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SyncStatus"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null while the run is in progress"
+          },
+          "trigger": {
+            "$ref": "#/components/schemas/SyncTrigger"
+          }
+        },
+        "required": [
+          "id",
+          "connector_id",
+          "trigger",
+          "started_at",
+          "finished_at",
+          "status",
+          "events_added",
+          "error"
+        ],
+        "title": "SyncRunRead",
+        "type": "object"
+      },
+      "SyncRunsResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SyncRunRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_before": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Pass as `before` to get older runs",
+            "title": "Next Before"
+          }
+        },
+        "required": [
+          "items",
+          "next_before"
+        ],
+        "title": "SyncRunsResponse",
+        "type": "object"
+      },
+      "SyncStarted": {
+        "properties": {
+          "connector_ids": {
+            "description": "Connectors queued for this sync",
+            "items": {
+              "type": "string"
+            },
+            "title": "Connector Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "connector_ids"
+        ],
+        "title": "SyncStarted",
+        "type": "object"
+      },
+      "SyncStatus": {
+        "enum": [
+          "ok",
+          "partial",
+          "failed"
+        ],
+        "title": "SyncStatus",
+        "type": "string"
+      },
+      "SyncTrigger": {
+        "enum": [
+          "startup",
+          "schedule",
+          "manual"
+        ],
+        "title": "SyncTrigger",
         "type": "string"
       },
       "Tally": {
@@ -939,6 +1535,233 @@
         ]
       }
     },
+    "/api/v1/connector-types": {
+      "get": {
+        "description": "Installed connectors: config schema, secrets needed, event kinds and rule fields.",
+        "operationId": "getConnectorTypes",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorTypesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Connector Types",
+        "tags": [
+          "connectors"
+        ]
+      }
+    },
+    "/api/v1/connectors": {
+      "get": {
+        "description": "Your connector instances with status and last sync.",
+        "operationId": "getConnectors",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Connectors",
+        "tags": [
+          "connectors"
+        ]
+      },
+      "post": {
+        "description": "Add an instance of an installed connector type. Secrets stay in .env.",
+        "operationId": "createConnector",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectorCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Create Connector",
+        "tags": [
+          "connectors"
+        ]
+      }
+    },
+    "/api/v1/connectors/{connector_id}/test": {
+      "post": {
+        "description": "Run the connector's connection test. A failure is a normal result, not an error.",
+        "operationId": "testConnector",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connector_id",
+            "required": true,
+            "schema": {
+              "title": "Connector Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorTestResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Test Connector",
+        "tags": [
+          "connectors"
+        ]
+      }
+    },
     "/api/v1/jobs/close": {
       "post": {
         "description": "Run the close job now. It also runs at midnight and on startup.",
@@ -1271,6 +2094,220 @@
         "summary": "Skip",
         "tags": [
           "occurrences"
+        ]
+      }
+    },
+    "/api/v1/status": {
+      "get": {
+        "description": "Sidebar summary: inbox and backlog counts, last and next sync, connector errors.",
+        "operationId": "getStatus",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Status",
+        "tags": [
+          "sync"
+        ]
+      }
+    },
+    "/api/v1/sync": {
+      "post": {
+        "description": "Sync now: one connector, or every enabled one. Returns at once; poll /status.",
+        "operationId": "startSync",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncStarted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Start Sync",
+        "tags": [
+          "sync"
+        ]
+      }
+    },
+    "/api/v1/sync/runs": {
+      "get": {
+        "description": "Sync history, newest first.",
+        "operationId": "getSyncRuns",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "connector_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Connector Id"
+            }
+          },
+          {
+            "description": "next_before from the previous page",
+            "in": "query",
+            "name": "before",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "next_before from the previous page",
+              "title": "Before"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncRunsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Sync Runs",
+        "tags": [
+          "sync"
         ]
       }
     },

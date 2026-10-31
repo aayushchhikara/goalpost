@@ -1,14 +1,26 @@
+from collections.abc import Iterator
 from datetime import UTC, date, datetime
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 
-from goalpost.db import get_session
+from goalpost.db import get_session_factory
+from goalpost.sdk.loader import Registry
+from goalpost.services.connectors import installed_connectors
 from goalpost.services.dates import local_date
 from goalpost.services.settings import ensure_settings
 
+SessionFactoryDep = Annotated[sessionmaker[Session], Depends(get_session_factory)]
+
+
+def get_session(factory: SessionFactoryDep) -> Iterator[Session]:
+    with factory() as session:
+        yield session
+
+
 SessionDep = Annotated[Session, Depends(get_session)]
+RegistryDep = Annotated[Registry, Depends(installed_connectors)]
 
 
 def get_now() -> datetime:

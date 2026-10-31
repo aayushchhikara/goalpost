@@ -35,6 +35,8 @@ class Connector(IdMixin, UserMixin, Base):
     secret_ref: Mapped[str | None] = mapped_column(String(128))
     cursor: Mapped[dict[str, Any] | None] = mapped_column(JSON)
     enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Set when an auth error paused syncing; cleared by a passing test or a successful sync.
+    pause_reason: Mapped[str | None] = mapped_column(Text)
 
 
 class SyncRun(IdMixin, UserMixin, Base):

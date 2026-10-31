@@ -1,0 +1,27 @@
+{
+  "data": {
+    "recentAcSubmissionList": [
+      {
+        "id": "1800000003",
+        "title": "Two Sum",
+        "titleSlug": "two-sum",
+        "timestamp": "1793038800",
+        "lang": "python3"
+      },
+      {
+        "id": "1800000002",
+        "title": "Merge Intervals",
+        "titleSlug": "merge-intervals",
+        "timestamp": "1792902600",
+        "lang": "java"
+      },
+      {
+        "id": "1800000001",
+        "title": "Two Sum",
+        "titleSlug": "two-sum",
+        "timestamp": "1792856700",
+        "lang": "cpp"
+      }
+    ]
+  }
+}
