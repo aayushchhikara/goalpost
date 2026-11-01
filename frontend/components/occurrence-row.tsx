@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { OccurrenceCheck } from "@/components/occurrence-check";
 import { useDrawer } from "@/components/shell/drawer-context";
 import { useAction } from "@/components/shell/toaster";
@@ -54,6 +56,14 @@ export function OccurrenceRow({
         </div>
         <div className="text-xs text-muted-foreground">{details(occurrence, adherence)}</div>
       </button>
+      {occurrence.pending_suggestion_id ? (
+        <Link
+          href="/inbox"
+          className="rounded-md bg-highlight px-2 py-0.5 text-xs font-medium text-primary hover:underline"
+        >
+          Proof found · Review
+        </Link>
+      ) : null}
       {occurrence.late && occurrence.status === "done" ? (
         <span className="rounded bg-late px-1.5 text-xs text-missed">Late</span>
       ) : null}

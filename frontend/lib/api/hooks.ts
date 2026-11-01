@@ -25,3 +25,27 @@ export function useTask(taskId: string | null) {
     unwrap(api.GET("/api/v1/tasks/{task_id}", { params: { path: { task_id: id } } })),
   );
 }
+
+export function useSuggestions() {
+  return useSWR("suggestions", () =>
+    unwrap(api.GET("/api/v1/suggestions", { params: { query: { status: "pending" } } })),
+  );
+}
+
+export function useUnplanned(monday: string | undefined) {
+  return useSWR(monday ? (["unplanned", monday] as const) : null, ([, week]) =>
+    unwrap(api.GET("/api/v1/events/unplanned", { params: { query: { week } } })),
+  );
+}
+
+export function useStatus() {
+  return useSWR("status", () => unwrap(api.GET("/api/v1/status")));
+}
+
+export function useConnectors() {
+  return useSWR("connectors", () => unwrap(api.GET("/api/v1/connectors")));
+}
+
+export function useConnectorTypes() {
+  return useSWR("connector-types", () => unwrap(api.GET("/api/v1/connector-types")));
+}

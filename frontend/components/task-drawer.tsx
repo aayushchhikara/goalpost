@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { DayPicker, Field, fieldClass } from "@/components/fields";
+import { EvidenceSection, RuleSection } from "@/components/rule-editor";
 import { LoadError, Loading, SectionHeading } from "@/components/screen-state";
 import { useDrawer } from "@/components/shell/drawer-context";
 import { useAction } from "@/components/shell/toaster";
@@ -210,6 +211,10 @@ function TaskEditor({
           </button>
         ) : null}
       </div>
+
+      <RuleSection key={detail.rule?.id ?? "none"} taskId={task.id} rule={detail.rule} />
+
+      <EvidenceSection evidence={detail.evidence} />
 
       <History detail={detail} today={today} />
 

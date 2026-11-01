@@ -16,7 +16,8 @@ type Result<T> = { data?: T; error?: unknown; response: Response };
 /** Return the response data, or throw an ApiError carrying the backend's error shape. */
 export async function unwrap<T>(request: Promise<Result<T>>): Promise<T> {
   const { data, error, response } = await request;
-  if (error !== undefined || data === undefined) {
+  // A 204 (e.g. a DELETE) is a success with no data.
+  if (!response.ok || error !== undefined) {
     const body = (error ?? {}) as Partial<ApiErrorBody>;
     const detail = body.details?.[0]?.message;
     throw new ApiError(
@@ -25,7 +26,7 @@ export async function unwrap<T>(request: Promise<Result<T>>): Promise<T> {
       response.status,
     );
   }
-  return data;
+  return data as T;
 }
 
 export function errorMessage(error: unknown): string {
