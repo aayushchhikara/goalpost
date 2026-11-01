@@ -98,6 +98,7 @@ def connector_types_view(registry: Registry, env: Mapping[str, str]) -> Connecto
                         description=k.description,
                         payload_schema=k.payload.model_json_schema(),
                         rule_fields=k.rule_fields,
+                        title_field=k.title_field,
                     )
                     for k in m.event_kinds
                 ],

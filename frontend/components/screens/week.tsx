@@ -267,7 +267,11 @@ function OccurrenceCard({
               (status === "pending" || status === "skipped") && "text-muted-foreground",
             )}
           >
-            {STATUS_LABEL[status]}
+            {occurrence.pending_suggestion_id && status !== "done" ? (
+              <span className="text-primary">Proof found</span>
+            ) : (
+              STATUS_LABEL[status]
+            )}
           </span>
           {occurrence.late && status === "done" ? (
             <span className="rounded bg-late px-1.5 text-missed">Late</span>

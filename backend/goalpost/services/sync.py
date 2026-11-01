@@ -20,6 +20,7 @@ from goalpost.models.enums import SyncStatus, SyncTrigger
 from goalpost.sdk.loader import Registry
 from goalpost.services.connectors import read_env, resolve_secrets
 from goalpost.services.dates import local_date
+from goalpost.services.rules import evaluate
 from goalpost.services.settings import ensure_settings
 
 log = logging.getLogger(__name__)
@@ -210,7 +211,16 @@ def _sync(
     run.events_added = added
     run.finished_at = datetime.now(UTC)
     session.commit()
-    # M4: run the rule engine over the new events here.
+
+    if added:
+        # New evidence may satisfy rules. The engine only suggests; nothing is marked done.
+        try:
+            timezone = ensure_settings(session).timezone
+            evaluate(session, local_date(datetime.now(UTC), timezone))
+            session.commit()
+        except Exception:
+            session.rollback()
+            log.exception("Rule engine failed after syncing connector %s", connector.id)
     return run
 
 

@@ -4,6 +4,7 @@ from goalpost.api.deps import NowDep, SessionDep, TodayDep
 from goalpost.schemas.planning import OccurrenceRead, OccurrenceUpdate
 from goalpost.services import occurrences
 from goalpost.services.planning import get_occurrence
+from goalpost.services.rules import evaluate
 
 router = APIRouter(prefix="/occurrences", tags=["occurrences"])
 
@@ -34,6 +35,7 @@ def skip(occurrence_id: str, session: SessionDep) -> OccurrenceRead:
 def reopen(occurrence_id: str, session: SessionDep, today: TodayDep) -> OccurrenceRead:
     """Undo a complete or skip."""
     occurrence = occurrences.reopen(session, get_occurrence(session, occurrence_id), today)
+    evaluate(session, today, [occurrence.task_id])
     session.commit()
     return OccurrenceRead.model_validate(occurrence)
 
@@ -44,5 +46,6 @@ def move(
 ) -> OccurrenceRead:
     """Move to another remaining day of the same week, or to "any day"."""
     occurrence = occurrences.move(session, get_occurrence(session, occurrence_id), body.date, today)
+    evaluate(session, today, [occurrence.task_id])  # a new day means a new evidence window
     session.commit()
     return OccurrenceRead.model_validate(occurrence)

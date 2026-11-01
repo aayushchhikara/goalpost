@@ -20,6 +20,7 @@ class EventKindRead(BaseModel):
     description: str
     payload_schema: dict[str, Any]
     rule_fields: list[str]
+    title_field: str | None
 
 
 class ConnectorTypeRead(BaseModel):

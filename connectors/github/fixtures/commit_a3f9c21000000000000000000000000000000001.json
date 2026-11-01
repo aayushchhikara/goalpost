@@ -1,0 +1,7 @@
+{
+  "sha": "a3f9c21000000000000000000000000000000001",
+  "html_url": "https://github.com/example-user/goalpost/commit/a3f9c21000000000000000000000000000000001",
+  "commit": { "author": { "name": "Example", "date": "2026-10-26T05:12:00Z" }, "message": "feat(frontend): today view layout" },
+  "parents": [{ "sha": "p1" }],
+  "files": [{ "filename": "frontend/components/screens/today.tsx" }, { "filename": "frontend/app/today/page.tsx" }]
+}

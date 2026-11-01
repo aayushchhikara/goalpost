@@ -21,8 +21,10 @@ from goalpost.schemas.planning import (
     WeekDay,
     WeekResponse,
 )
+from goalpost.sdk.loader import Registry
 from goalpost.services.dates import week_monday
 from goalpost.services.planning import check_monday, find_week, status_for_week, week_end
+from goalpost.services.rules import events_read, rule_read
 
 PRIORITY_RANK = {Priority.HIGH: 0, Priority.MEDIUM: 1, Priority.LOW: 2}
 
@@ -93,7 +95,9 @@ def backlog_view(session: Session, priority: Priority | None = None) -> BacklogR
     )
 
 
-def task_detail(session: Session, task: Task, today: date) -> TaskDetailResponse:
+def task_detail(
+    session: Session, registry: Registry, task: Task, today: date
+) -> TaskDetailResponse:
     occurrences = list(session.scalars(select(Occurrence).where(Occurrence.task_id == task.id)))
     history = sorted(
         occurrences, key=lambda o: (o.week_start, o.date or week_end(o.week_start)), reverse=True
@@ -112,6 +116,8 @@ def task_detail(session: Session, task: Task, today: date) -> TaskDetailResponse
         task=TaskRead.model_validate(task),
         current_occurrence=OccurrenceRead.model_validate(current) if current else None,
         history=_read(history),
+        rule=rule_read(session, task.rule) if task.rule else None,
+        evidence=events_read(session, registry, current.evidence_events) if current else [],
     )
 
 

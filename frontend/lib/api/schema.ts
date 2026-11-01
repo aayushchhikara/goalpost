@@ -88,6 +88,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/events/unplanned": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Unplanned
+         * @description Events in the week (its Monday; default this week) that back no occurrence.
+         */
+        get: operations["getUnplannedEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/jobs/close": {
         parameters: {
             query?: never;
@@ -148,6 +168,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/occurrences/{occurrence_id}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Attach Evidence
+         * @description Attach events by hand; marks the occurrence done. One event may back several occurrences.
+         */
+        post: operations["attachEvidence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/occurrences/{occurrence_id}/reopen": {
         parameters: {
             query?: never;
@@ -202,6 +242,87 @@ export interface paths {
         get: operations["getStatus"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Suggestions
+         * @description The Proof Inbox: suggestions with their occurrence, rule and events. Nothing counts until
+         *     you accept it.
+         */
+        get: operations["getSuggestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/suggestions/{suggestion_id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept
+         * @description Mark the occurrence done and attach the events as evidence.
+         */
+        post: operations["acceptSuggestion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/suggestions/{suggestion_id}/reassign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reassign
+         * @description Move the evidence to the occurrence you pick, and accept it there.
+         */
+        post: operations["reassignSuggestion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/suggestions/{suggestion_id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reject
+         * @description Reject; optionally add an exclusion so the rule ignores events like these.
+         */
+        post: operations["rejectSuggestion"];
         delete?: never;
         options?: never;
         head?: never;
@@ -309,6 +430,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/tasks/{task_id}/rule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Rule
+         * @description Set or replace the task's rule: connector, event kind, filters and count.
+         */
+        put: operations["setRule"];
+        post?: never;
+        /**
+         * Delete Rule
+         * @description Remove the rule; the task becomes manual. Pending suggestions from it are dropped.
+         */
+        delete: operations["deleteRule"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/rule/exclusions/{exclusion_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Exclusion
+         * @description Remove a learned exclusion, so the rule matches those events again.
+         */
+        delete: operations["deleteRuleExclusion"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/today": {
         parameters: {
             query?: never;
@@ -410,6 +575,11 @@ export interface components {
             task_id: string;
             /** Title */
             title: string;
+        };
+        /** AttachEvidenceRequest */
+        AttachEvidenceRequest: {
+            /** Event Ids */
+            event_ids: string[];
         };
         /**
          * AuthKind
@@ -595,7 +765,72 @@ export interface components {
             };
             /** Rule Fields */
             rule_fields: string[];
+            /** Title Field */
+            title_field: string | null;
         };
+        /** EventRead */
+        EventRead: {
+            /** Connector Id */
+            connector_id: string;
+            /** Connector Name */
+            connector_name: string;
+            /** Connector Type */
+            connector_type: string;
+            /** Id */
+            id: string;
+            /** Kind */
+            kind: string;
+            /**
+             * Local Date
+             * Format: date
+             */
+            local_date: string;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            /**
+             * Title
+             * @description A one-line label, e.g. a commit message or problem name
+             */
+            title: string;
+            /** Url */
+            url: string | null;
+        };
+        /** ExclusionRead */
+        ExclusionRead: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Created From Suggestion Id */
+            created_from_suggestion_id: string | null;
+            filter: components["schemas"]["Filter"];
+            /** Id */
+            id: string;
+        };
+        /**
+         * Filter
+         * @description A condition on one payload field. A list field, like a commit's paths, matches any item.
+         */
+        Filter: {
+            /** Field */
+            field: string;
+            op: components["schemas"]["FilterOp"];
+            /** Value */
+            value: string | number | string[];
+        };
+        /**
+         * FilterOp
+         * @enum {string}
+         */
+        FilterOp: "equals" | "one_of" | "contains" | "matches" | "regex" | "at_least" | "at_most";
         /** HealthResponse */
         HealthResponse: {
             /** Status */
@@ -614,10 +849,17 @@ export interface components {
              * @description Null means any day this week
              */
             date: string | null;
+            /** Evidence Count */
+            evidence_count: number;
             /** Id */
             id: string;
             /** Late */
             late: boolean;
+            /**
+             * Pending Suggestion Id
+             * @description A suggestion waiting in the Proof Inbox
+             */
+            pending_suggestion_id: string | null;
             status: components["schemas"]["OccurrenceStatus"];
             task: components["schemas"]["TaskSummary"];
             /**
@@ -676,6 +918,63 @@ export interface components {
          * @enum {string}
          */
         Priority: "high" | "medium" | "low";
+        /** ReassignRequest */
+        ReassignRequest: {
+            /**
+             * Occurrence Id
+             * @description The occurrence the evidence really belongs to
+             */
+            occurrence_id: string;
+        };
+        /** RejectRequest */
+        RejectRequest: {
+            /** @description Also stop the rule matching events like these, e.g. message regex ^chore: */
+            exclusion?: components["schemas"]["Filter"] | null;
+        };
+        /** RuleRead */
+        RuleRead: {
+            /** Connector Id */
+            connector_id: string;
+            /**
+             * Connector Name
+             * @description Null if the connector was removed
+             */
+            connector_name: string | null;
+            /** Connector Type */
+            connector_type: string;
+            /**
+             * Exclusions
+             * @description Learned from rejected suggestions
+             */
+            exclusions: components["schemas"]["ExclusionRead"][];
+            /** Filters */
+            filters: components["schemas"]["Filter"][];
+            /** Id */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Min Count */
+            min_count: number;
+            /** Task Id */
+            task_id: string;
+        };
+        /**
+         * RuleSet
+         * @description A rule: one connector instance and event kind, filters that must all match, and a count.
+         */
+        RuleSet: {
+            /** Connector Id */
+            connector_id: string;
+            /** Filters */
+            filters?: components["schemas"]["Filter"][];
+            /** Kind */
+            kind: string;
+            /**
+             * Min Count
+             * @default 1
+             */
+            min_count?: number;
+        };
         /** SecretRequirement */
         SecretRequirement: {
             /**
@@ -706,6 +1005,46 @@ export interface components {
             next_sync_at: string | null;
             /** Syncing */
             syncing: boolean;
+        };
+        /** SuggestionRead */
+        SuggestionRead: {
+            /**
+             * Confidence
+             * @description AI suggestions only
+             */
+            confidence: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Events */
+            events: components["schemas"]["EventRead"][];
+            /** Id */
+            id: string;
+            occurrence: components["schemas"]["OccurrenceRead"];
+            /** Reason */
+            reason: string | null;
+            /** Resolved At */
+            resolved_at: string | null;
+            rule: components["schemas"]["RuleRead"] | null;
+            source: components["schemas"]["SuggestionSource"];
+            status: components["schemas"]["SuggestionStatus"];
+        };
+        /**
+         * SuggestionSource
+         * @enum {string}
+         */
+        SuggestionSource: "rule" | "ai";
+        /**
+         * SuggestionStatus
+         * @enum {string}
+         */
+        SuggestionStatus: "pending" | "accepted" | "rejected";
+        /** SuggestionsResponse */
+        SuggestionsResponse: {
+            /** Items */
+            items: components["schemas"]["SuggestionRead"][];
         };
         /** SyncRequest */
         SyncRequest: {
@@ -810,10 +1149,17 @@ export interface components {
             /** @description This week's occurrence, if any */
             current_occurrence: components["schemas"]["OccurrenceRead"] | null;
             /**
+             * Evidence
+             * @description Evidence on the current occurrence
+             */
+            evidence: components["schemas"]["EventRead"][];
+            /**
              * History
              * @description Every occurrence, newest week first
              */
             history: components["schemas"]["OccurrenceRead"][];
+            /** @description The completion rule, if the task has one */
+            rule: components["schemas"]["RuleRead"] | null;
             task: components["schemas"]["TaskRead"];
         };
         /**
@@ -898,6 +1244,19 @@ export interface components {
              */
             items: components["schemas"]["OccurrenceRead"][];
             summary: components["schemas"]["Tally"];
+            /**
+             * Week Start
+             * Format: date
+             */
+            week_start: string;
+        };
+        /** UnplannedResponse */
+        UnplannedResponse: {
+            /**
+             * Items
+             * @description Events this week that back no occurrence
+             */
+            items: components["schemas"]["EventRead"][];
             /**
              * Week Start
              * Format: date
@@ -1197,6 +1556,55 @@ export interface operations {
             };
         };
     };
+    getUnplannedEvents: {
+        parameters: {
+            query?: {
+                week?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnplannedResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     runCloseJob: {
         parameters: {
             query?: {
@@ -1310,6 +1718,59 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OccurrenceRead"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    attachEvidence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                occurrence_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AttachEvidenceRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -1463,6 +1924,210 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StatusResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getSuggestions: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["SuggestionStatus"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestionsResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    acceptSuggestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                suggestion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestionRead"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    reassignSuggestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                suggestion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReassignRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestionRead"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    rejectSuggestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                suggestion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejectRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestionRead"];
                 };
             };
             /** @description Not Found */
@@ -1769,6 +2434,154 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["TaskDetailResponse"];
                 };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    setRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RuleSet"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RuleRead"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteRuleExclusion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+                exclusion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Not Found */
             404: {

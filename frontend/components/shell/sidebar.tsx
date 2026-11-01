@@ -3,17 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { useBacklog } from "@/lib/api/hooks";
+import { useStatus } from "@/lib/api/hooks";
 import { cn } from "@/lib/utils";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const backlog = useBacklog();
+  const status = useStatus();
   const nav = [
     { href: "/today", label: "Today" },
     { href: "/week", label: "Week" },
-    { href: "/inbox", label: "Proof Inbox" },
-    { href: "/backlog", label: "Backlog", count: backlog.data?.items.length },
+    // Suggestions are waiting on you, so the inbox count stands out.
+    { href: "/inbox", label: "Proof Inbox", count: status.data?.inbox_count, urgent: true },
+    { href: "/backlog", label: "Backlog", count: status.data?.backlog_count },
     { href: "/connectors", label: "Connectors" },
   ];
 
@@ -23,7 +24,7 @@ export function Sidebar() {
       className="flex shrink-0 grow-0 basis-[216px] flex-col gap-0.5 border-r border-border bg-sidebar px-3 py-6"
     >
       <div className="px-3 pb-5 text-base font-semibold tracking-tight">goalpost</div>
-      {nav.map(({ href, label, count }) => {
+      {nav.map(({ href, label, count, urgent }) => {
         const current = pathname.startsWith(href);
         return (
           <Link
@@ -37,7 +38,16 @@ export function Sidebar() {
           >
             {label}
             {count ? (
-              <span className="font-mono text-xs text-muted-foreground">{count}</span>
+              <span
+                className={cn(
+                  "font-mono text-xs",
+                  urgent
+                    ? "rounded-[10px] bg-primary px-[7px] text-primary-foreground"
+                    : "text-muted-foreground",
+                )}
+              >
+                {count}
+              </span>
             ) : null}
           </Link>
         );

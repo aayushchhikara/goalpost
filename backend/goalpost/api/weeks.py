@@ -6,6 +6,7 @@ from goalpost.api.deps import SessionDep, TodayDep
 from goalpost.models.enums import Priority
 from goalpost.schemas.planning import BacklogResponse, PlanWeekRequest, TodayResponse, WeekResponse
 from goalpost.services.planning import plan_week
+from goalpost.services.rules import evaluate
 from goalpost.services.views import backlog_view, today_view, week_view
 
 router = APIRouter(tags=["weeks"])
@@ -21,6 +22,7 @@ def get_week(monday: date, session: SessionDep, today: TodayDep) -> WeekResponse
 def plan(monday: date, body: PlanWeekRequest, session: SessionDep, today: TodayDep) -> WeekResponse:
     """Plan backlog or existing tasks into a week; also adds every open recurring task's days."""
     plan_week(session, monday, [(item.task_id, item.date) for item in body.items], today)
+    evaluate(session, today)  # evidence may already exist for newly planned occurrences
     session.commit()
     return week_view(session, monday, today)
 

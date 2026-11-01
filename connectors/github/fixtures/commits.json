@@ -1,0 +1,17 @@
+[
+  {
+    "sha": "a3f9c21000000000000000000000000000000001",
+    "commit": { "author": { "name": "Example", "date": "2026-10-26T05:12:00Z" }, "message": "feat(frontend): today view layout" },
+    "parents": [{ "sha": "p1" }]
+  },
+  {
+    "sha": "m3rge00000000000000000000000000000000002",
+    "commit": { "author": { "name": "Example", "date": "2026-10-26T06:00:00Z" }, "message": "Merge pull request #23 from example-user/feature" },
+    "parents": [{ "sha": "p1" }, { "sha": "p2" }]
+  },
+  {
+    "sha": "e91d0a6000000000000000000000000000000003",
+    "commit": { "author": { "name": "Example", "date": "2026-10-26T18:20:00Z" }, "message": "fix token refresh on expired session\n\nThe old helper retried forever." },
+    "parents": [{ "sha": "a3f9c21000000000000000000000000000000001" }]
+  }
+]

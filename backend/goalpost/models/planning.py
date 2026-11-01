@@ -1,4 +1,5 @@
 import datetime as dt
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Date, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -6,6 +7,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from goalpost.db import Base
 from goalpost.models.base import DEFAULT_USER_ID, IdMixin, UserMixin, UTCDateTime, str_enum, utcnow
 from goalpost.models.enums import OccurrenceStatus, Priority, TaskKind, TaskStatus, WeekStatus
+
+if TYPE_CHECKING:
+    from goalpost.models.evidence import Event, Rule, Suggestion
 
 
 class UserSettings(IdMixin, Base):
@@ -42,6 +46,7 @@ class Task(IdMixin, UserMixin, Base):
     created_at: Mapped[dt.datetime] = mapped_column(UTCDateTime(), default=utcnow)
 
     first_planned_week: Mapped[Week | None] = relationship(lazy="joined")
+    rule: Mapped["Rule | None"] = relationship(lazy="selectin", viewonly=True)
 
     @property
     def first_planned_week_start(self) -> dt.date | None:
@@ -64,6 +69,23 @@ class Occurrence(IdMixin, UserMixin, Base):
 
     task: Mapped[Task] = relationship(lazy="joined")
     week: Mapped[Week] = relationship(lazy="joined")
+    suggestions: Mapped[list["Suggestion"]] = relationship(lazy="selectin", viewonly=True)
+    evidence_events: Mapped[list["Event"]] = relationship(
+        secondary="evidence", lazy="selectin", order_by="Event.occurred_at", viewonly=True
+    )
+
+    @property
+    def pending_suggestion(self) -> "Suggestion | None":
+        return next((s for s in self.suggestions if s.status == "pending"), None)
+
+    @property
+    def pending_suggestion_id(self) -> str | None:
+        suggestion = self.pending_suggestion
+        return suggestion.id if suggestion else None
+
+    @property
+    def evidence_count(self) -> int:
+        return len(self.evidence_events)
 
     @property
     def week_start(self) -> dt.date:

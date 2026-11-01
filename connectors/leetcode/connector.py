@@ -75,6 +75,7 @@ class LeetCodeConnector(Connector[LeetCodeConfig]):
                 description="An accepted submission",
                 payload=Submission,
                 rule_fields=["status", "difficulty", "problem", "language"],
+                title_field="problem",
             )
         ],
         sync_hints=SyncHints(min_interval=timedelta(hours=1), max_items=RECENT_LIMIT),

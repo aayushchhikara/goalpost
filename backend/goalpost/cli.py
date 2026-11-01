@@ -9,7 +9,9 @@ sync would, and prints them with their local dates. Nothing is saved.
 import argparse
 import json
 import sys
-from typing import Any
+from typing import Any, get_origin
+
+from pydantic import BaseModel, ValidationError
 
 from goalpost.sdk import ConnectorError, PartialResult
 from goalpost.services.connectors import installed_connectors, read_env, resolve_secrets
@@ -17,13 +19,19 @@ from goalpost.services.dates import local_date
 from goalpost.services.sync import validate_events
 
 
-def _parse_config(pairs: list[str]) -> dict[str, Any]:
-    config: dict[str, Any] = {}
+def _parse_config(pairs: list[str], schema: type[BaseModel]) -> dict[str, Any]:
+    """key=value pairs. Repeat a key for a list field: --config repos=a/b --config repos=c/d."""
+    values: dict[str, list[str]] = {}
     for pair in pairs:
         key, sep, value = pair.partition("=")
         if not sep:
             raise SystemExit(f"--config expects key=value, got {pair!r}")
-        config[key] = value
+        values.setdefault(key, []).append(value)
+    config: dict[str, Any] = {}
+    for key, items in values.items():
+        field = schema.model_fields.get(key)
+        is_list = field is not None and get_origin(field.annotation) is list
+        config[key] = items if is_list else items[-1]
     return config
 
 
@@ -37,7 +45,7 @@ def dry_run(args: argparse.Namespace) -> int:
     env = read_env()
     timezone = args.timezone or env.get("GOALPOST_TIMEZONE") or "UTC"
     try:
-        config = manifest.config.model_validate(_parse_config(args.config))
+        config = manifest.config.model_validate(_parse_config(args.config, manifest.config))
         secrets = resolve_secrets(manifest, args.secret_ref, env)
         cursor = json.loads(args.cursor) if args.cursor else None
         try:
@@ -45,6 +53,10 @@ def dry_run(args: argparse.Namespace) -> int:
         except PartialResult as exc:
             print(f"Partial result: {exc}")
             result = exc.result
+    except ValidationError as exc:
+        for err in exc.errors():
+            print(f"Config {'.'.join(str(p) for p in err['loc'])}: {err['msg']}")
+        return 2
     except ConnectorError as exc:
         print(f"{type(exc).__name__}: {exc}")
         return 1
