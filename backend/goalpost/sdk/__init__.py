@@ -33,12 +33,17 @@ class EventKind(BaseModel):
     rule_fields: list[str] = Field(
         default_factory=list, description="Payload fields rules filter on"
     )
+    title_field: str | None = Field(
+        default=None, description="Payload field shown as the event's title, e.g. a commit message"
+    )
 
     @model_validator(mode="after")
     def _rule_fields_exist(self) -> "EventKind":
         unknown = set(self.rule_fields) - set(self.payload.model_fields)
         if unknown:
             raise ValueError(f"rule_fields not in the {self.name} payload: {sorted(unknown)}")
+        if self.title_field and self.title_field not in self.payload.model_fields:
+            raise ValueError(f"title_field {self.title_field!r} is not in the {self.name} payload")
         return self
 
 

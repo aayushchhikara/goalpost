@@ -19,10 +19,19 @@ def complete(session: Session, occurrence: Occurrence, now: datetime, today: dat
         raise Conflict("Occurrence is already done", code="already_done")
     if occurrence.status == OccurrenceStatus.SKIPPED:
         raise Conflict("Occurrence was skipped; reopen it first", code="skipped")
-    # missed → done keeps history honest with the late flag.
-    occurrence.late = occurrence.status == OccurrenceStatus.MISSED
+    # missed → done by hand keeps history honest with the late flag.
+    return mark_done(
+        session, occurrence, now, late=occurrence.status == OccurrenceStatus.MISSED, today=today
+    )
+
+
+def mark_done(
+    session: Session, occurrence: Occurrence, completed_at: datetime, *, late: bool, today: date
+) -> Occurrence:
+    """Mark done, and finish a one-off task. Only explicit user actions call this."""
+    occurrence.late = late
     occurrence.status = OccurrenceStatus.DONE
-    occurrence.completed_at = now
+    occurrence.completed_at = completed_at
 
     task = occurrence.task
     if task.kind == TaskKind.ONE_OFF and task.status == TaskStatus.OPEN:

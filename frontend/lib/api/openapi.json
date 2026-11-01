@@ -62,6 +62,23 @@
         "title": "Adherence",
         "type": "object"
       },
+      "AttachEvidenceRequest": {
+        "properties": {
+          "event_ids": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Event Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "event_ids"
+        ],
+        "title": "AttachEvidenceRequest",
+        "type": "object"
+      },
       "AuthKind": {
         "enum": [
           "none",
@@ -550,16 +567,181 @@
             },
             "title": "Rule Fields",
             "type": "array"
+          },
+          "title_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title Field"
           }
         },
         "required": [
           "name",
           "description",
           "payload_schema",
-          "rule_fields"
+          "rule_fields",
+          "title_field"
         ],
         "title": "EventKindRead",
         "type": "object"
+      },
+      "EventRead": {
+        "properties": {
+          "connector_id": {
+            "title": "Connector Id",
+            "type": "string"
+          },
+          "connector_name": {
+            "title": "Connector Name",
+            "type": "string"
+          },
+          "connector_type": {
+            "title": "Connector Type",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "local_date": {
+            "format": "date",
+            "title": "Local Date",
+            "type": "string"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "title": "Occurred At",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "title": {
+            "description": "A one-line label, e.g. a commit message or problem name",
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "id",
+          "connector_id",
+          "connector_name",
+          "connector_type",
+          "kind",
+          "title",
+          "url",
+          "occurred_at",
+          "local_date",
+          "payload"
+        ],
+        "title": "EventRead",
+        "type": "object"
+      },
+      "ExclusionRead": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_from_suggestion_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created From Suggestion Id"
+          },
+          "filter": {
+            "$ref": "#/components/schemas/Filter"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "filter",
+          "created_from_suggestion_id",
+          "created_at"
+        ],
+        "title": "ExclusionRead",
+        "type": "object"
+      },
+      "Filter": {
+        "description": "A condition on one payload field. A list field, like a commit's paths, matches any item.",
+        "properties": {
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "op": {
+            "$ref": "#/components/schemas/FilterOp"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "field",
+          "op",
+          "value"
+        ],
+        "title": "Filter",
+        "type": "object"
+      },
+      "FilterOp": {
+        "enum": [
+          "equals",
+          "one_of",
+          "contains",
+          "matches",
+          "regex",
+          "at_least",
+          "at_most"
+        ],
+        "title": "FilterOp",
+        "type": "string"
       },
       "HealthResponse": {
         "properties": {
@@ -610,6 +792,10 @@
             "description": "Null means any day this week",
             "title": "Date"
           },
+          "evidence_count": {
+            "title": "Evidence Count",
+            "type": "integer"
+          },
           "id": {
             "title": "Id",
             "type": "string"
@@ -617,6 +803,18 @@
           "late": {
             "title": "Late",
             "type": "boolean"
+          },
+          "pending_suggestion_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A suggestion waiting in the Proof Inbox",
+            "title": "Pending Suggestion Id"
           },
           "status": {
             "$ref": "#/components/schemas/OccurrenceStatus"
@@ -638,7 +836,9 @@
           "status",
           "late",
           "completed_at",
-          "carried_over"
+          "carried_over",
+          "pending_suggestion_id",
+          "evidence_count"
         ],
         "title": "OccurrenceRead",
         "type": "object"
@@ -752,6 +952,138 @@
         "title": "Priority",
         "type": "string"
       },
+      "ReassignRequest": {
+        "properties": {
+          "occurrence_id": {
+            "description": "The occurrence the evidence really belongs to",
+            "title": "Occurrence Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "occurrence_id"
+        ],
+        "title": "ReassignRequest",
+        "type": "object"
+      },
+      "RejectRequest": {
+        "properties": {
+          "exclusion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Filter"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Also stop the rule matching events like these, e.g. message regex ^chore:"
+          }
+        },
+        "title": "RejectRequest",
+        "type": "object"
+      },
+      "RuleRead": {
+        "properties": {
+          "connector_id": {
+            "title": "Connector Id",
+            "type": "string"
+          },
+          "connector_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null if the connector was removed",
+            "title": "Connector Name"
+          },
+          "connector_type": {
+            "title": "Connector Type",
+            "type": "string"
+          },
+          "exclusions": {
+            "description": "Learned from rejected suggestions",
+            "items": {
+              "$ref": "#/components/schemas/ExclusionRead"
+            },
+            "title": "Exclusions",
+            "type": "array"
+          },
+          "filters": {
+            "items": {
+              "$ref": "#/components/schemas/Filter"
+            },
+            "title": "Filters",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "min_count": {
+            "title": "Min Count",
+            "type": "integer"
+          },
+          "task_id": {
+            "title": "Task Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "task_id",
+          "connector_id",
+          "connector_type",
+          "connector_name",
+          "kind",
+          "filters",
+          "min_count",
+          "exclusions"
+        ],
+        "title": "RuleRead",
+        "type": "object"
+      },
+      "RuleSet": {
+        "description": "A rule: one connector instance and event kind, filters that must all match, and a count.",
+        "properties": {
+          "connector_id": {
+            "title": "Connector Id",
+            "type": "string"
+          },
+          "filters": {
+            "items": {
+              "$ref": "#/components/schemas/Filter"
+            },
+            "title": "Filters",
+            "type": "array"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "min_count": {
+            "default": 1,
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Min Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "connector_id",
+          "kind"
+        ],
+        "title": "RuleSet",
+        "type": "object"
+      },
       "SecretRequirement": {
         "properties": {
           "name": {
@@ -828,6 +1160,127 @@
           "connector_errors"
         ],
         "title": "StatusResponse",
+        "type": "object"
+      },
+      "SuggestionRead": {
+        "properties": {
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "AI suggestions only",
+            "title": "Confidence"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/EventRead"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "occurrence": {
+            "$ref": "#/components/schemas/OccurrenceRead"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "rule": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RuleRead"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "$ref": "#/components/schemas/SuggestionSource"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SuggestionStatus"
+          }
+        },
+        "required": [
+          "id",
+          "occurrence",
+          "source",
+          "rule",
+          "confidence",
+          "reason",
+          "status",
+          "events",
+          "created_at",
+          "resolved_at"
+        ],
+        "title": "SuggestionRead",
+        "type": "object"
+      },
+      "SuggestionSource": {
+        "enum": [
+          "rule",
+          "ai"
+        ],
+        "title": "SuggestionSource",
+        "type": "string"
+      },
+      "SuggestionStatus": {
+        "enum": [
+          "pending",
+          "accepted",
+          "rejected"
+        ],
+        "title": "SuggestionStatus",
+        "type": "string"
+      },
+      "SuggestionsResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SuggestionRead"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "SuggestionsResponse",
         "type": "object"
       },
       "SyncRequest": {
@@ -1102,6 +1555,14 @@
             ],
             "description": "This week's occurrence, if any"
           },
+          "evidence": {
+            "description": "Evidence on the current occurrence",
+            "items": {
+              "$ref": "#/components/schemas/EventRead"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
           "history": {
             "description": "Every occurrence, newest week first",
             "items": {
@@ -1110,6 +1571,17 @@
             "title": "History",
             "type": "array"
           },
+          "rule": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RuleRead"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The completion rule, if the task has one"
+          },
           "task": {
             "$ref": "#/components/schemas/TaskRead"
           }
@@ -1117,7 +1589,9 @@
         "required": [
           "task",
           "current_occurrence",
-          "history"
+          "history",
+          "rule",
+          "evidence"
         ],
         "title": "TaskDetailResponse",
         "type": "object"
@@ -1366,6 +1840,29 @@
           "summary"
         ],
         "title": "TodayResponse",
+        "type": "object"
+      },
+      "UnplannedResponse": {
+        "properties": {
+          "items": {
+            "description": "Events this week that back no occurrence",
+            "items": {
+              "$ref": "#/components/schemas/EventRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "week_start": {
+            "format": "date",
+            "title": "Week Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "week_start",
+          "items"
+        ],
+        "title": "UnplannedResponse",
         "type": "object"
       },
       "WeekDay": {
@@ -1762,6 +2259,77 @@
         ]
       }
     },
+    "/api/v1/events/unplanned": {
+      "get": {
+        "description": "Events in the week (its Monday; default this week) that back no occurrence.",
+        "operationId": "getUnplannedEvents",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "week",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Week"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnplannedResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Unplanned",
+        "tags": [
+          "inbox"
+        ]
+      }
+    },
     "/api/v1/jobs/close": {
       "post": {
         "description": "Run the close job now. It also runs at midnight and on startup.",
@@ -1971,6 +2539,79 @@
         ]
       }
     },
+    "/api/v1/occurrences/{occurrence_id}/evidence": {
+      "post": {
+        "description": "Attach events by hand; marks the occurrence done. One event may back several occurrences.",
+        "operationId": "attachEvidence",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "occurrence_id",
+            "required": true,
+            "schema": {
+              "title": "Occurrence Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachEvidenceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OccurrenceRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Attach Evidence",
+        "tags": [
+          "inbox"
+        ]
+      }
+    },
     "/api/v1/occurrences/{occurrence_id}/reopen": {
       "post": {
         "description": "Undo a complete or skip.",
@@ -2146,6 +2787,285 @@
         "summary": "Get Status",
         "tags": [
           "sync"
+        ]
+      }
+    },
+    "/api/v1/suggestions": {
+      "get": {
+        "description": "The Proof Inbox: suggestions with their occurrence, rule and events. Nothing counts until\nyou accept it.",
+        "operationId": "getSuggestions",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SuggestionStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestionsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Suggestions",
+        "tags": [
+          "inbox"
+        ]
+      }
+    },
+    "/api/v1/suggestions/{suggestion_id}/accept": {
+      "post": {
+        "description": "Mark the occurrence done and attach the events as evidence.",
+        "operationId": "acceptSuggestion",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "suggestion_id",
+            "required": true,
+            "schema": {
+              "title": "Suggestion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Accept",
+        "tags": [
+          "inbox"
+        ]
+      }
+    },
+    "/api/v1/suggestions/{suggestion_id}/reassign": {
+      "post": {
+        "description": "Move the evidence to the occurrence you pick, and accept it there.",
+        "operationId": "reassignSuggestion",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "suggestion_id",
+            "required": true,
+            "schema": {
+              "title": "Suggestion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReassignRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Reassign",
+        "tags": [
+          "inbox"
+        ]
+      }
+    },
+    "/api/v1/suggestions/{suggestion_id}/reject": {
+      "post": {
+        "description": "Reject; optionally add an exclusion so the rule ignores events like these.",
+        "operationId": "rejectSuggestion",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "suggestion_id",
+            "required": true,
+            "schema": {
+              "title": "Suggestion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Reject",
+        "tags": [
+          "inbox"
         ]
       }
     },
@@ -2566,6 +3486,198 @@
         "summary": "Drop Task",
         "tags": [
           "tasks"
+        ]
+      }
+    },
+    "/api/v1/tasks/{task_id}/rule": {
+      "delete": {
+        "description": "Remove the rule; the task becomes manual. Pending suggestions from it are dropped.",
+        "operationId": "deleteRule",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "required": true,
+            "schema": {
+              "title": "Task Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Delete Rule",
+        "tags": [
+          "rules"
+        ]
+      },
+      "put": {
+        "description": "Set or replace the task's rule: connector, event kind, filters and count.",
+        "operationId": "setRule",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "required": true,
+            "schema": {
+              "title": "Task Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Set Rule",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/tasks/{task_id}/rule/exclusions/{exclusion_id}": {
+      "delete": {
+        "description": "Remove a learned exclusion, so the rule matches those events again.",
+        "operationId": "deleteRuleExclusion",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "required": true,
+            "schema": {
+              "title": "Task Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "exclusion_id",
+            "required": true,
+            "schema": {
+              "title": "Exclusion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Delete Exclusion",
+        "tags": [
+          "rules"
         ]
       }
     },

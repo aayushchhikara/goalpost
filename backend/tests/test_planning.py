@@ -5,6 +5,7 @@ from goalpost.errors import Conflict, Invalid
 from goalpost.models import Occurrence, Task, Week
 from goalpost.models.enums import OccurrenceStatus, TaskKind, TaskStatus, WeekStatus
 from goalpost.schemas.planning import PlanTarget, TaskCreate, TaskUpdate
+from goalpost.sdk.loader import Registry
 from goalpost.services import occurrences, tasks
 from goalpost.services.close import close_due
 from goalpost.services.planning import find_week, plan_week
@@ -203,7 +204,7 @@ def test_backlog_task_planned_again_is_carried_over_and_keeps_history(db_session
 
     plan_week(db_session, NEXT_MON, [(task.id, None)], NEXT_MON)
     assert task.in_backlog is False
-    detail = task_detail(db_session, task, NEXT_MON)
+    detail = task_detail(db_session, Registry(), task, NEXT_MON)
     assert [(o.week_start, o.status.value) for o in detail.history] == [
         (NEXT_MON, "pending"),
         (MON, "missed"),

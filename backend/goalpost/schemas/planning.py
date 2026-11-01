@@ -11,6 +11,7 @@ from pydantic import (
 )
 
 from goalpost.models.enums import OccurrenceStatus, Priority, TaskKind, TaskStatus, WeekStatus
+from goalpost.schemas.rules import EventRead, RuleRead
 from goalpost.services.dates import decode_days
 
 # Weekdays as in date.weekday(): Monday = 0 … Sunday = 6.
@@ -121,6 +122,8 @@ class OccurrenceRead(BaseModel):
     late: bool
     completed_at: dt.datetime | None
     carried_over: bool
+    pending_suggestion_id: str | None = Field(description="A suggestion waiting in the Proof Inbox")
+    evidence_count: int
 
 
 class Tally(BaseModel):
@@ -178,6 +181,8 @@ class TaskDetailResponse(BaseModel):
     task: TaskRead
     current_occurrence: OccurrenceRead | None = Field(description="This week's occurrence, if any")
     history: list[OccurrenceRead] = Field(description="Every occurrence, newest week first")
+    rule: RuleRead | None = Field(description="The completion rule, if the task has one")
+    evidence: list[EventRead] = Field(description="Evidence on the current occurrence")
 
 
 class CloseResult(BaseModel):

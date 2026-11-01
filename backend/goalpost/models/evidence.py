@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import (
     JSON,
@@ -12,7 +12,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from goalpost.db import Base
 from goalpost.models.base import IdMixin, UserMixin, UTCDateTime, str_enum, utcnow
@@ -23,6 +23,9 @@ from goalpost.models.enums import (
     SyncStatus,
     SyncTrigger,
 )
+
+if TYPE_CHECKING:
+    from goalpost.models.planning import Occurrence
 
 
 class Connector(IdMixin, UserMixin, Base):
@@ -73,7 +76,12 @@ class Rule(IdMixin, UserMixin, Base):
 
     task_id: Mapped[str] = mapped_column(ForeignKey("tasks.id", ondelete="CASCADE"), unique=True)
     connector_type: Mapped[str] = mapped_column(String(64))
+    # A RuleSet: connector_id, kind, filters [{field, op, value}], min_count (schemas.inbox)
     condition: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    exclusions: Mapped[list["RuleExclusion"]] = relationship(
+        lazy="selectin", order_by="RuleExclusion.created_at", viewonly=True
+    )
 
 
 class Suggestion(IdMixin, UserMixin, Base):
@@ -89,6 +97,12 @@ class Suggestion(IdMixin, UserMixin, Base):
     )
     created_at: Mapped[dt.datetime] = mapped_column(UTCDateTime(), default=utcnow)
     resolved_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime())
+
+    occurrence: Mapped["Occurrence"] = relationship(lazy="joined")
+    rule: Mapped[Rule | None] = relationship(lazy="joined")
+    events: Mapped[list[Event]] = relationship(
+        secondary="suggestion_events", lazy="selectin", order_by="Event.occurred_at", viewonly=True
+    )
 
 
 class RuleExclusion(IdMixin, UserMixin, Base):

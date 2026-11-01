@@ -2,7 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter
 
-from goalpost.api import connectors, jobs, occurrences, sync, tasks, weeks
+from goalpost.api import connectors, inbox, jobs, occurrences, rules, sync, tasks, weeks
 from goalpost.schemas.errors import ErrorResponse
 
 ERROR_RESPONSES: dict[int | str, dict[str, Any]] = {
@@ -16,3 +16,5 @@ router.include_router(occurrences.router)
 router.include_router(jobs.router)
 router.include_router(connectors.router)
 router.include_router(sync.router)
+router.include_router(rules.router)
+router.include_router(inbox.router)
