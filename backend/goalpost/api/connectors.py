@@ -7,6 +7,7 @@ from goalpost.schemas.connectors import (
     ConnectorsResponse,
     ConnectorTestResult,
     ConnectorTypesResponse,
+    ConnectorUpdate,
 )
 from goalpost.services import connectors
 
@@ -38,6 +39,20 @@ def create_connector(
 ) -> ConnectorRead:
     """Add an instance of an installed connector type. Secrets stay in .env."""
     row = connectors.create_connector(session, registry, body)
+    session.commit()
+    return connectors.connector_read(session, row)
+
+
+@router.patch(
+    "/connectors/{connector_id}", response_model=ConnectorRead, operation_id="updateConnector"
+)
+def update_connector(
+    connector_id: str, body: ConnectorUpdate, session: SessionDep, registry: RegistryDep
+) -> ConnectorRead:
+    """Rename, change config, point at another .env key, or enable and disable."""
+    row = connectors.update_connector(
+        session, registry, connectors.get_connector(session, connector_id), body
+    )
     session.commit()
     return connectors.connector_read(session, row)
 

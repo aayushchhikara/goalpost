@@ -197,3 +197,29 @@ def test_sync_runs_page_with_before(client: TestClient) -> None:
 def test_syncing_an_unknown_connector_is_404(client: TestClient) -> None:
     resp = client.post(f"{API}/sync", json={"connector_id": "01NOPE00000000000000000000"})
     assert resp.status_code == 404
+
+
+def test_updating_a_connector(client: TestClient) -> None:
+    connector = add_connector(client)
+    Fake.script = [sdk.AuthError("Token revoked")]
+    client.post(f"{API}/sync", json={})
+    assert client.get(f"{API}/connectors").json()["items"][0]["status"] == "paused"
+
+    # New settings start the cursor over and lift the pause.
+    updated = client.patch(
+        f"{API}/connectors/{connector['id']}", json={"name": "Judge", "config": {"username": "you"}}
+    ).json()
+    assert (updated["name"], updated["config"], updated["pause_reason"]) == (
+        "Judge",
+        {"username": "you"},
+        None,
+    )
+
+    disabled = client.patch(f"{API}/connectors/{connector['id']}", json={"enabled": False}).json()
+    assert (disabled["enabled"], disabled["status"]) == (False, "disabled")
+    assert client.post(f"{API}/sync", json={}).json() == {"connector_ids": []}
+
+    bad = client.patch(f"{API}/connectors/{connector['id']}", json={"config": {"username": ""}})
+    assert bad.status_code == 422
+    assert bad.json()["details"][0]["field"] == "config.username"
+    assert client.patch(f"{API}/connectors/01NOPE00000000000000000000", json={}).status_code == 404

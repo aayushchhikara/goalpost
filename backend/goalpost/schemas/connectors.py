@@ -62,6 +62,17 @@ class ConnectorCreate(BaseModel):
     )
 
 
+class ConnectorUpdate(BaseModel):
+    """Fields left out stay as they are."""
+
+    name: str | None = None
+    config: dict[str, Any] | None = Field(
+        default=None, description="Replaces the whole config; the sync cursor starts over"
+    )
+    secret_ref: str | None = Field(default=None, description="Empty string resets to the default")
+    enabled: bool | None = Field(default=None, description="Disabled connectors never sync")
+
+
 class SyncRunRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
