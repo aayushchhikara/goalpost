@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { priorityLabel, recurrenceLabel, tallyLabel } from "./format";
+import { priorityLabel, recurrenceLabel, tallyLabel, timeAgo } from "./format";
 
 describe("format", () => {
   it("summarises recurrence days", () => {
@@ -18,5 +18,16 @@ describe("format", () => {
 
   it("labels priority", () => {
     expect(priorityLabel("medium")).toBe("Medium");
+  });
+});
+
+describe("timeAgo", () => {
+  const now = new Date("2026-11-01T12:00:00Z");
+  it("rounds to a readable unit", () => {
+    expect(timeAgo("2026-11-01T11:59:40Z", now)).toBe("just now");
+    expect(timeAgo("2026-11-01T11:55:00Z", now)).toBe("5 min ago");
+    expect(timeAgo("2026-11-01T10:00:00Z", now)).toBe("2 h ago");
+    expect(timeAgo("2026-10-31T12:00:00Z", now)).toBe("1 day ago");
+    expect(timeAgo("2026-10-29T12:00:00Z", now)).toBe("3 days ago");
   });
 });

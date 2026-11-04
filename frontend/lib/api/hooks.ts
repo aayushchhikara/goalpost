@@ -38,8 +38,17 @@ export function useUnplanned(monday: string | undefined) {
   );
 }
 
+/** Polls every 2 s while a sync runs, so the sidebar and Connectors page show it finishing. */
 export function useStatus() {
-  return useSWR("status", () => unwrap(api.GET("/api/v1/status")));
+  return useSWR("status", () => unwrap(api.GET("/api/v1/status")), {
+    refreshInterval: (data) => (data?.syncing ? 2000 : 60000),
+  });
+}
+
+export function useSyncRuns(limit = 20) {
+  return useSWR(["sync-runs", limit] as const, () =>
+    unwrap(api.GET("/api/v1/sync/runs", { params: { query: { limit } } })),
+  );
 }
 
 export function useConnectors() {

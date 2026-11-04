@@ -36,3 +36,19 @@ export function tallyLabel(tally: Pick<Tally, "done" | "planned" | "skipped" | "
   const base = `${tally.done}/${tally.planned - tally.skipped}`;
   return tally.late ? `${base} · ${tally.late} late` : base;
 }
+
+/** "just now", "5 min ago", "2 h ago", "3 days ago" */
+export function timeAgo(iso: string, now: Date = new Date()): string {
+  const minutes = Math.round((now.getTime() - new Date(iso).getTime()) / 60_000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours} h ago`;
+  const days = Math.round(hours / 24);
+  return `${days} ${days === 1 ? "day" : "days"} ago`;
+}
+
+/** "14:05" in the browser's timezone */
+export function clockTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+}

@@ -2,7 +2,15 @@ import { mutate } from "swr";
 
 import { api } from "./client";
 import { unwrap } from "./errors";
-import type { Filter, PlanItem, RuleSet, TaskCreate, TaskUpdate } from "./types";
+import type {
+  ConnectorCreate,
+  ConnectorUpdate,
+  Filter,
+  PlanItem,
+  RuleSet,
+  TaskCreate,
+  TaskUpdate,
+} from "./types";
 
 /** Every write changes several screens, so refresh everything that is loaded. */
 async function write<T>(request: Promise<{ data?: T; error?: unknown; response: Response }>) {
@@ -14,6 +22,7 @@ async function write<T>(request: Promise<{ data?: T; error?: unknown; response: 
 const task = (id: string) => ({ params: { path: { task_id: id } } });
 const occurrence = (id: string) => ({ params: { path: { occurrence_id: id } } });
 const suggestion = (id: string) => ({ params: { path: { suggestion_id: id } } });
+const connector = (id: string) => ({ params: { path: { connector_id: id } } });
 
 export const actions = {
   createTask: (body: TaskCreate) => write(api.POST("/api/v1/tasks", { body })),
@@ -57,6 +66,14 @@ export const actions = {
   setRule: (taskId: string, body: RuleSet) =>
     write(api.PUT("/api/v1/tasks/{task_id}/rule", { ...task(taskId), body })),
   deleteRule: (taskId: string) => write(api.DELETE("/api/v1/tasks/{task_id}/rule", task(taskId))),
+  createConnector: (body: ConnectorCreate) => write(api.POST("/api/v1/connectors", { body })),
+  updateConnector: (id: string, body: ConnectorUpdate) =>
+    write(api.PATCH("/api/v1/connectors/{connector_id}", { ...connector(id), body })),
+  testConnector: (id: string) =>
+    write(api.POST("/api/v1/connectors/{connector_id}/test", connector(id))),
+  /** Starts a sync in the background; poll /status (useStatus does) to see it finish. */
+  sync: (connectorId?: string) =>
+    write(api.POST("/api/v1/sync", { body: { connector_id: connectorId ?? null } })),
   deleteExclusion: (taskId: string, exclusionId: string) =>
     write(
       api.DELETE("/api/v1/tasks/{task_id}/rule/exclusions/{exclusion_id}", {
