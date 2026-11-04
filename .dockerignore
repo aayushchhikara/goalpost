@@ -1,7 +1,12 @@
-node_modules
-.next
-.venv
+# Keep the build context small and never ship host-built artifacts or secrets.
+**/node_modules
+**/.next
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/*.tsbuildinfo
 data
 .env
 .git
-**/__pycache__
+docs

@@ -7,9 +7,9 @@ COPY frontend/ ./
 RUN pnpm build
 
 FROM node:24-slim
-RUN corepack enable
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app ./
 EXPOSE 3000
-CMD ["pnpm", "start", "-H", "0.0.0.0"]
+# Run Next directly: starting through pnpm would need corepack to download pnpm at runtime.
+CMD ["node_modules/.bin/next", "start", "-H", "0.0.0.0"]
