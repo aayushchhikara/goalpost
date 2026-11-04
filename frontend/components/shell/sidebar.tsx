@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { SyncStatus } from "@/components/shell/sync-status";
 import { useStatus } from "@/lib/api/hooks";
 import { cn } from "@/lib/utils";
 
@@ -52,6 +53,7 @@ export function Sidebar() {
           </Link>
         );
       })}
+      <SyncStatus />
     </nav>
   );
 }

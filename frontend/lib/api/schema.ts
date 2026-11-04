@@ -68,6 +68,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/connectors/{connector_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Connector
+         * @description Rename, change config, point at another .env key, or enable and disable.
+         */
+        patch: operations["updateConnector"];
+        trace?: never;
+    };
     "/api/v1/connectors/{connector_id}/test": {
         parameters: {
             query?: never;
@@ -731,6 +751,31 @@ export interface components {
              * @description Connector folders that failed to load
              */
             load_errors: components["schemas"]["ConnectorLoadProblem"][];
+        };
+        /**
+         * ConnectorUpdate
+         * @description Fields left out stay as they are.
+         */
+        ConnectorUpdate: {
+            /**
+             * Config
+             * @description Replaces the whole config; the sync cursor starts over
+             */
+            config?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Enabled
+             * @description Disabled connectors never sync
+             */
+            enabled?: boolean | null;
+            /** Name */
+            name?: string | null;
+            /**
+             * Secret Ref
+             * @description Empty string resets to the default
+             */
+            secret_ref?: string | null;
         };
         /** ConnectorsResponse */
         ConnectorsResponse: {
@@ -1471,6 +1516,59 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorRead"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateConnector: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connector_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnectorUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

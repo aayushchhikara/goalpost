@@ -23,6 +23,7 @@ from goalpost.schemas.connectors import (
     ConnectorTestResult,
     ConnectorTypeRead,
     ConnectorTypesResponse,
+    ConnectorUpdate,
     EventKindRead,
     SecretRequirement,
     SyncRunRead,
@@ -136,6 +137,34 @@ def create_connector(session: Session, registry: Registry, data: ConnectorCreate
         secret_ref=data.secret_ref,
     )
     session.add(row)
+    session.flush()
+    return row
+
+
+def update_connector(
+    session: Session, registry: Registry, row: Connector, data: ConnectorUpdate
+) -> Connector:
+    changes = data.model_dump(exclude_unset=True)
+    if changes.get("name") is not None:
+        row.name = changes["name"].strip() or row.name
+    if changes.get("enabled") is not None:
+        row.enabled = changes["enabled"]
+    cls = registry.get(row.type)
+    if changes.get("config") is not None:
+        if cls is None:
+            raise Invalid(f"Connector type {row.type!r} isn't installed", field="config")
+        config = parse_config(cls.manifest, changes["config"]).model_dump(mode="json")
+        if config != row.config:
+            row.config = config
+            row.cursor = None  # a cursor for the old settings means nothing for the new ones
+            row.pause_reason = None  # new settings may well fix what paused it
+    if "secret_ref" in changes:
+        ref = (changes["secret_ref"] or "").strip() or None
+        if ref and cls is not None and not cls.manifest.secrets:
+            raise Invalid(f"{cls.manifest.name} doesn't use secrets", field="secret_ref")
+        if ref != row.secret_ref:
+            row.secret_ref = ref
+            row.pause_reason = None
     session.flush()
     return row
 
